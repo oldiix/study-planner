@@ -1,13 +1,25 @@
 import {useState} from 'react'
 import Header from './components/Header'
+import TaskFilters from './components/TaskFilters'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
 import {initialTasks} from './data/initialTasks'
-import type {NewTask, Task} from './types/task'
+import type {NewTask, Task, TaskFilter} from './types/task'
 import './App.scss'
 
 export default function App() {
     const [tasks, setTasks] = useState<Task[]>(initialTasks)
+    const [filter, setFilter] = useState<TaskFilter>('all')
+
+    const visibleTasks = tasks.filter((task) => {
+        if (filter === 'completed') {
+            return task.completed
+        }
+        if (filter === 'active') {
+            return !task.completed
+        }
+        return true
+    })
 
     function handleAddTask(newTask: NewTask) {
         const task: Task = {...newTask, id: Date.now(), completed: false}
@@ -29,7 +41,8 @@ export default function App() {
             <Header/>
             <main className="app__main">
                 <TaskForm onAdd={handleAddTask}/>
-                <TaskList tasks={tasks} onToggle={handleToggleTask} onDelete={handleDeleteTask}/>
+                <TaskFilters filter={filter} onChange={setFilter}/>
+                <TaskList tasks={visibleTasks} onToggle={handleToggleTask} onDelete={handleDeleteTask}/>
             </main>
         </div>
     )

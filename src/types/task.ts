@@ -1,5 +1,6 @@
 export type Priority = 'low' | 'medium' | 'high'
 export type NewTask = Omit<Task, 'id' | 'completed'>
+export type TaskFilter = 'all' | 'completed' | 'active'
 
 export type Task = {
     id: number
