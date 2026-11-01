@@ -8,6 +8,7 @@ export const initialTasks: Task[] = [
         completed: false,
         priority: 'high',
         category: 'React',
+        categoryColor: 'blue',
     },
     {
         id: 2,
@@ -16,6 +17,7 @@ export const initialTasks: Task[] = [
         completed: true,
         priority: 'medium',
         category: 'TypeScript',
+        categoryColor: 'indigo',
     },
     {
         id: 3,
@@ -24,6 +26,7 @@ export const initialTasks: Task[] = [
         completed: false,
         priority: 'medium',
         category: 'React',
+        categoryColor: 'blue',
     },
     {
         id: 4,
@@ -32,5 +35,6 @@ export const initialTasks: Task[] = [
         completed: false,
         priority: 'low',
         category: 'CSS',
+        categoryColor: 'pink',
     },
 ]

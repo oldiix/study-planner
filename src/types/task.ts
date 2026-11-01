@@ -1,7 +1,6 @@
 export type Priority = 'low' | 'medium' | 'high'
-export type NewTask = Omit<Task, 'id' | 'completed'>
-export type TaskFilter = 'all' | 'completed' | 'active'
-export type TaskSortOrder = 'newest' | 'priority'
+
+export type CategoryColor = 'indigo' | 'blue' | 'green' | 'orange' | 'pink' | 'gray'
 
 export type Task = {
     id: number
@@ -10,4 +9,11 @@ export type Task = {
     completed: boolean
     priority: Priority
     category: string
+    categoryColor: CategoryColor
 }
+
+export type NewTask = Omit<Task, 'id' | 'completed'>
+
+export type TaskFilter = 'all' | 'completed' | 'active'
+
+export type TaskSortOrder = 'newest' | 'priority'

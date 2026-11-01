@@ -17,7 +17,9 @@ export default function TaskItem({task, onToggle, onDelete}: TaskItemProps) {
                 {task.description && <p className="task-item__description">{task.description}</p>}
 
                 <div className="task-item__meta">
-                    <span className="task-item__category">{task.category}</span>
+          <span className={`task-item__category task-item__category--${task.categoryColor}`}>
+            {task.category}
+          </span>
                     <span className={`task-item__priority task-item__priority--${task.priority}`}>
             {task.priority}
           </span>

@@ -1,16 +1,19 @@
 import {useState} from 'react'
 import type {ChangeEvent, FormEvent} from 'react'
-import type {NewTask, Priority} from '../types/task'
+import type {CategoryColor, NewTask, Priority} from '../types/task'
 import './TaskForm.scss'
 
 type TaskFormProps = {
     onAdd: (task: NewTask) => void
 }
 
+const categoryColors: CategoryColor[] = ['indigo', 'blue', 'green', 'orange', 'pink', 'gray']
+
 const emptyForm: NewTask = {
     title: '',
     description: '',
     category: '',
+    categoryColor: 'indigo',
     priority: 'medium',
 }
 
@@ -36,6 +39,7 @@ export default function TaskForm({onAdd}: TaskFormProps) {
             title,
             description: form.description.trim(),
             category: form.category.trim() || 'General',
+            categoryColor: form.categoryColor,
             priority: form.priority,
         })
 
@@ -113,6 +117,26 @@ export default function TaskForm({onAdd}: TaskFormProps) {
                     </select>
                 </div>
             </div>
+
+            <fieldset className="task-form__colors">
+                <legend className="task-form__label">Category color</legend>
+                <div className="task-form__swatches">
+                    {categoryColors.map((color) => (
+                        <label key={color} className="task-form__swatch-option">
+                            <input
+                                type="radio"
+                                name="category-color"
+                                className="task-form__swatch-input"
+                                value={color}
+                                checked={form.categoryColor === color}
+                                onChange={() => setForm({...form, categoryColor: color})}
+                                aria-label={color}
+                            />
+                            <span className={`task-form__swatch task-form__swatch--${color}`}/>
+                        </label>
+                    ))}
+                </div>
+            </fieldset>
 
             <button type="submit" className="task-form__submit">
                 Add
