@@ -3,6 +3,7 @@ import Header from './components/Header'
 import TaskFilters from './components/TaskFilters'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
+import TaskStats from './components/TaskStats'
 import {initialTasks} from './data/initialTasks'
 import type {NewTask, Task, TaskFilter} from './types/task'
 import './App.scss'
@@ -41,6 +42,7 @@ export default function App() {
             <Header/>
             <main className="app__main">
                 <TaskForm onAdd={handleAddTask}/>
+                <TaskStats tasks={tasks}/>
                 <TaskFilters filter={filter} onChange={setFilter}/>
                 <TaskList tasks={visibleTasks} onToggle={handleToggleTask} onDelete={handleDeleteTask}/>
             </main>

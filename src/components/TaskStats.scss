@@ -1,0 +1,36 @@
+@use '../styles/variables' as *;
+
+.task-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius;
+    background-color: $color-surface;
+
+    &--completed .task-stats__value {
+      color: $color-success;
+    }
+
+    &--active .task-stats__value {
+      color: $color-warning;
+    }
+  }
+
+  &__value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: $color-primary;
+  }
+
+  &__label {
+    font-size: 0.85rem;
+    color: $color-text-muted;
+  }
+}

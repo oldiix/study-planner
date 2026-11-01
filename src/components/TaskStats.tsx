@@ -1,0 +1,29 @@
+import type {Task} from '../types/task'
+import './TaskStats.scss'
+
+type TaskStatsProps = {
+    tasks: Task[]
+}
+
+export default function TaskStats({tasks}: TaskStatsProps) {
+    const total = tasks.length
+    const completed = tasks.filter((task) => task.completed).length
+    const active = total - completed
+
+    return (
+        <section className="task-stats" aria-label="Task statistics">
+            <div className="task-stats__item">
+                <span className="task-stats__value">{total}</span>
+                <span className="task-stats__label">Total</span>
+            </div>
+            <div className="task-stats__item task-stats__item--completed">
+                <span className="task-stats__value">{completed}</span>
+                <span className="task-stats__label">Completed</span>
+            </div>
+            <div className="task-stats__item task-stats__item--active">
+                <span className="task-stats__value">{active}</span>
+                <span className="task-stats__label">Active</span>
+            </div>
+        </section>
+    )
+}
