@@ -1,75 +1,85 @@
-# React + TypeScript + Vite
+# Study Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple study task planner built with React and TypeScript.
 
-Currently, two official plugins are available:
+This branch contains **Lab 08 — React Fundamentals**: components, JSX, props, state, events, lists and conditional
+rendering. Data is stored in React state only, so it resets after a page reload.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Add a task with title, description, category, category color and priority
+- Required title validation without third-party libraries
+- Mark a task as completed or return it to the active state
+- Delete completed tasks
+- Filter tasks: All, Completed, Active
+- Sort tasks by priority
+- Statistics: total, completed and active tasks
+- Empty state messages for an empty list and an empty filter result
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech stack
 
-## Expanding the ESLint configuration
+- React 19, TypeScript
+- Vite
+- SCSS with BEM naming
+- ESLint
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+| Script          | Description                         |
+|-----------------|-------------------------------------|
+| `npm run dev`   | start the development server        |
+| `npm run build` | type-check and build for production |
+| `npm run lint`  | run ESLint                          |
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project structure
 
 ```
+src/
+├── components/
+│   ├── Header.tsx
+│   ├── TaskFilters.tsx
+│   ├── TaskForm.tsx
+│   ├── TaskItem.tsx
+│   ├── TaskList.tsx
+│   ├── TaskSort.tsx
+│   └── TaskStats.tsx
+├── data/
+│   └── initialTasks.ts
+├── styles/
+│   ├── _mixins.scss
+│   ├── _variables.scss
+│   └── global.scss
+├── types/
+│   └── task.ts
+├── App.tsx
+└── main.tsx
+```
+
+## Component tree
+
+```
+App            state: tasks, filter, sortOrder
+├── Header
+├── TaskForm   local state: form fields, validation error
+├── TaskStats  derived: total, completed, active
+├── TaskFilters
+├── TaskSort
+└── TaskList
+    └── TaskItem
+```
+
+Shared state lives in `App` and is passed down through props. Child components report user actions back to `App` through
+callback props (`onAdd`, `onToggle`, `onDelete`, `onChange`). The filtered and sorted list and the statistics are
+calculated during rendering instead of being stored in separate state.
+
+## Branches
+
+| Branch                       | Lab                         |
+|------------------------------|-----------------------------|
+| `main`                       | Vite starter project        |
+| `feature/react-fundamentals` | Lab 08 — React Fundamentals |
