@@ -44,7 +44,12 @@ export default function App() {
                 <TaskForm onAdd={handleAddTask}/>
                 <TaskStats tasks={tasks}/>
                 <TaskFilters filter={filter} onChange={setFilter}/>
-                <TaskList tasks={visibleTasks} onToggle={handleToggleTask} onDelete={handleDeleteTask}/>
+                <TaskList
+                    tasks={visibleTasks}
+                    hasAnyTasks={tasks.length > 0}
+                    onToggle={handleToggleTask}
+                    onDelete={handleDeleteTask}
+                />
             </main>
         </div>
     )
