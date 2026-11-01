@@ -2,13 +2,11 @@
 @use '../styles/mixins' as *;
 
 .task-form {
+  @include card;
   display: flex;
   flex-direction: column;
   gap: 16px;
   padding: 20px;
-  border: 1px solid $color-border;
-  border-radius: $radius;
-  background-color: $color-surface;
 
   &__heading {
     margin: 0;
@@ -19,10 +17,6 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
-
-    @media (max-width: 560px) {
-      grid-template-columns: 1fr;
-    }
   }
 
   &__field {
@@ -42,6 +36,8 @@
     border-radius: $radius;
     color: $color-text;
     background-color: $color-surface;
+    transition: border-color $transition,
+    box-shadow $transition;
 
     &:focus {
       outline: none;
@@ -78,6 +74,16 @@
       border-color: $color-primary-dark;
       color: #fff;
       background-color: $color-primary-dark;
+    }
+  }
+
+  @media (max-width: 560px) {
+    &__row {
+      grid-template-columns: 1fr;
+    }
+
+    &__submit {
+      align-self: stretch;
     }
   }
 }

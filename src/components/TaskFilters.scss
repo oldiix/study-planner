@@ -8,6 +8,8 @@
 
   &__button {
     @include button;
+    padding: 6px 16px;
+    border-radius: 999px;
 
     &--active,
     &--active:hover {

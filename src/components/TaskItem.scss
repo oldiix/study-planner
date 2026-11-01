@@ -2,18 +2,23 @@
 @use '../styles/mixins' as *;
 
 .task-item {
+  @include card;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
   padding: 16px;
-  border: 1px solid $color-border;
-  border-radius: $radius;
-  background-color: $color-surface;
+  transition: box-shadow $transition,
+  background-color $transition;
+
+  &:hover {
+    box-shadow: $shadow-hover;
+  }
 
   &__title {
     margin: 0;
     font-size: 1.05rem;
+    transition: color $transition;
   }
 
   &__description {
@@ -41,7 +46,18 @@
   }
 
   &__priority {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     text-transform: capitalize;
+
+    &::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: currentColor;
+    }
 
     &--low {
       color: $color-success;
@@ -81,6 +97,7 @@
 
   &--completed {
     background-color: $color-bg;
+    box-shadow: none;
   }
 
   &--completed &__title {
