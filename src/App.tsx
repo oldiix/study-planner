@@ -3,16 +3,24 @@ import Header from './components/Header'
 import TaskFilters from './components/TaskFilters'
 import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
+import TaskSort from './components/TaskSort'
 import TaskStats from './components/TaskStats'
 import {initialTasks} from './data/initialTasks'
-import type {NewTask, Task, TaskFilter} from './types/task'
+import type {NewTask, Priority, Task, TaskFilter, TaskSortOrder} from './types/task'
 import './App.scss'
+
+const priorityRank: Record<Priority, number> = {
+    high: 0,
+    medium: 1,
+    low: 2,
+}
 
 export default function App() {
     const [tasks, setTasks] = useState<Task[]>(initialTasks)
     const [filter, setFilter] = useState<TaskFilter>('all')
+    const [sortOrder, setSortOrder] = useState<TaskSortOrder>('newest')
 
-    const visibleTasks = tasks.filter((task) => {
+    const filteredTasks = tasks.filter((task) => {
         if (filter === 'completed') {
             return task.completed
         }
@@ -21,6 +29,11 @@ export default function App() {
         }
         return true
     })
+
+    const visibleTasks =
+        sortOrder === 'priority'
+            ? [...filteredTasks].sort((a, b) => priorityRank[a.priority] - priorityRank[b.priority])
+            : filteredTasks
 
     function handleAddTask(newTask: NewTask) {
         const task: Task = {...newTask, id: Date.now(), completed: false}
@@ -43,7 +56,10 @@ export default function App() {
             <main className="app__main">
                 <TaskForm onAdd={handleAddTask}/>
                 <TaskStats tasks={tasks}/>
-                <TaskFilters filter={filter} onChange={setFilter}/>
+                <div className="app__toolbar">
+                    <TaskFilters filter={filter} onChange={setFilter}/>
+                    <TaskSort value={sortOrder} onChange={setSortOrder}/>
+                </div>
                 <TaskList
                     tasks={visibleTasks}
                     hasAnyTasks={tasks.length > 0}

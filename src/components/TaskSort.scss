@@ -1,0 +1,26 @@
+@use '../styles/variables' as *;
+
+.task-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &__label {
+    font-size: 0.9rem;
+    color: $color-text-muted;
+  }
+
+  &__select {
+    padding: 6px 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius;
+    color: $color-text;
+    background-color: $color-surface;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: 2px;
+    }
+  }
+}
