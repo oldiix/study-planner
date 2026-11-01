@@ -1,12 +1,18 @@
 import {useState} from 'react'
 import Header from './components/Header'
+import TaskForm from './components/TaskForm'
 import TaskList from './components/TaskList'
 import {initialTasks} from './data/initialTasks'
-import type {Task} from './types/task'
+import type {NewTask, Task} from './types/task'
 import './App.scss'
 
 export default function App() {
     const [tasks, setTasks] = useState<Task[]>(initialTasks)
+
+    function handleAddTask(newTask: NewTask) {
+        const task: Task = {...newTask, id: Date.now(), completed: false}
+        setTasks((prevTasks) => [task, ...prevTasks])
+    }
 
     function handleToggleTask(id: number) {
         setTasks((prevTasks) =>
@@ -22,6 +28,7 @@ export default function App() {
         <div className="app">
             <Header/>
             <main className="app__main">
+                <TaskForm onAdd={handleAddTask}/>
                 <TaskList tasks={tasks} onToggle={handleToggleTask} onDelete={handleDeleteTask}/>
             </main>
         </div>

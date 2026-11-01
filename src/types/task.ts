@@ -1,4 +1,5 @@
 export type Priority = 'low' | 'medium' | 'high'
+export type NewTask = Omit<Task, 'id' | 'completed'>
 
 export type Task = {
     id: number
