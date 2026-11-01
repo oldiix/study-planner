@@ -1,0 +1,94 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.task-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid $color-border;
+  border-radius: $radius;
+  background-color: $color-surface;
+
+  &__title {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+
+  &__description {
+    margin: 4px 0 0;
+    color: $color-text-muted;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 0.85rem;
+  }
+
+  &__category,
+  &__priority {
+    padding: 2px 10px;
+    border-radius: 999px;
+  }
+
+  &__category {
+    color: $color-primary;
+    background-color: $color-primary-light;
+  }
+
+  &__priority {
+    text-transform: capitalize;
+
+    &--low {
+      color: $color-success;
+      background-color: $color-success-light;
+    }
+
+    &--medium {
+      color: $color-warning;
+      background-color: $color-warning-light;
+    }
+
+    &--high {
+      color: $color-danger;
+      background-color: $color-danger-light;
+    }
+  }
+
+  &__status {
+    align-self: center;
+    color: $color-text-muted;
+  }
+
+  &__actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  &__button {
+    @include button;
+
+    &--danger:hover {
+      border-color: $color-danger;
+      color: $color-danger;
+    }
+  }
+
+  &--completed {
+    background-color: $color-bg;
+  }
+
+  &--completed &__title {
+    color: $color-text-muted;
+    text-decoration: line-through;
+  }
+
+  @media (max-width: 560px) {
+    flex-direction: column;
+  }
+}

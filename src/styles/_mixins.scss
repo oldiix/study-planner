@@ -1,0 +1,22 @@
+@use 'variables' as *;
+
+@mixin button {
+  padding: 6px 12px;
+  border: 1px solid $color-border;
+  border-radius: $radius;
+  color: $color-text;
+  background-color: $color-surface;
+  cursor: pointer;
+  transition: color 0.15s,
+  border-color 0.15s;
+
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary;
+    outline-offset: 2px;
+  }
+}
