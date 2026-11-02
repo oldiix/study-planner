@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import type {ChangeEvent, FormEvent} from 'react'
+import type {ChangeEvent, SubmitEvent} from 'react'
 import type {CategoryColor, NewTask, Priority} from '../types/task'
 import './TaskForm.scss'
 
@@ -26,7 +26,7 @@ export default function TaskForm({onAdd}: TaskFormProps) {
         setError('')
     }
 
-    function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault()
 
         const title = form.title.trim()
