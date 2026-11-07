@@ -112,9 +112,19 @@
     box-shadow: 0 0 0 3px $color-primary;
   }
 
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  &__cancel {
+    @include button;
+    padding: 8px 20px;
+  }
+
   &__submit {
     @include button;
-    align-self: flex-end;
     padding: 8px 24px;
     border-color: $color-primary;
     color: #fff;
@@ -132,8 +142,9 @@
       grid-template-columns: 1fr;
     }
 
-    &__submit {
-      align-self: stretch;
+    &__actions > * {
+      flex: 1;
     }
   }
+
 }

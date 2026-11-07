@@ -1,4 +1,4 @@
-import type {Task} from '../types/task'
+import type {NewTask, Task} from '../types/task'
 
 export type TaskState = {
     tasks: Task[]
@@ -6,6 +6,7 @@ export type TaskState = {
 
 export type TaskAction =
     | { type: 'add'; task: Task }
+    | { type: 'update'; id: number; changes: NewTask }
     | { type: 'toggle'; id: number }
     | { type: 'delete'; id: number }
 
@@ -13,6 +14,14 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
     switch (action.type) {
         case 'add':
             return {...state, tasks: [action.task, ...state.tasks]}
+
+        case 'update':
+            return {
+                ...state,
+                tasks: state.tasks.map((task) =>
+                    task.id === action.id ? {...task, ...action.changes} : task,
+                ),
+            }
 
         case 'toggle':
             return {

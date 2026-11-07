@@ -110,6 +110,15 @@
     text-decoration: line-through;
   }
 
+  &--editing,
+  &--editing:hover {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
   @media (max-width: 560px) {
     flex-direction: column;
   }

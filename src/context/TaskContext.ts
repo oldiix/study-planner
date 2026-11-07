@@ -8,6 +8,7 @@ export type TaskContextValue = {
     sortOrder: TaskSortOrder
     setSortOrder: (sortOrder: TaskSortOrder) => void
     addTask: (task: NewTask) => void
+    updateTask: (id: number, changes: NewTask) => void
     toggleTask: (id: number) => void
     deleteTask: (id: number) => void
 }

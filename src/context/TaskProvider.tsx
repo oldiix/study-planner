@@ -41,6 +41,10 @@ export default function TaskProvider({children}: TaskProviderProps) {
         dispatch({type: 'add', task})
     }
 
+    function updateTask(id: number, changes: NewTask) {
+        dispatch({type: 'update', id, changes})
+    }
+
     function toggleTask(id: number) {
         dispatch({type: 'toggle', id})
     }
@@ -56,6 +60,7 @@ export default function TaskProvider({children}: TaskProviderProps) {
         sortOrder,
         setSortOrder,
         addTask,
+        updateTask,
         toggleTask,
         deleteTask,
     }

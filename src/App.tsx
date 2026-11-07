@@ -22,7 +22,7 @@ export default function App() {
         <div className="app">
             <Header/>
             <main className="app__main">
-                <TaskForm onAdd={addTask}/>
+                <TaskForm heading="New task" submitLabel="Add" onSubmit={addTask}/>
                 <TaskStats/>
                 <div className="app__toolbar">
                     <TaskFilters/>

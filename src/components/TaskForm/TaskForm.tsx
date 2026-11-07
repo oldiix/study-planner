@@ -1,10 +1,14 @@
-import {useState} from 'react'
+import {useId, useState} from 'react'
 import type {ChangeEvent, SubmitEvent} from 'react'
-import type {CategoryColor, NewTask, Priority} from '../../types/task.ts'
+import type {CategoryColor, NewTask, Priority} from '../../types/task'
 import './TaskForm.scss'
 
 type TaskFormProps = {
-    onAdd: (task: NewTask) => void
+    heading?: string
+    submitLabel: string
+    initialValues?: NewTask
+    onSubmit: (task: NewTask) => void
+    onCancel?: () => void
 }
 
 const categoryColors: CategoryColor[] = ['indigo', 'blue', 'green', 'orange', 'pink', 'gray']
@@ -17,8 +21,15 @@ const emptyForm: NewTask = {
     priority: 'medium',
 }
 
-export default function TaskForm({onAdd}: TaskFormProps) {
-    const [form, setForm] = useState<NewTask>(emptyForm)
+export default function TaskForm({
+                                     heading,
+                                     submitLabel,
+                                     initialValues = emptyForm,
+                                     onSubmit,
+                                     onCancel,
+                                 }: TaskFormProps) {
+    const id = useId()
+    const [form, setForm] = useState<NewTask>(initialValues)
     const [error, setError] = useState('')
 
     function handleTitleChange(event: ChangeEvent<HTMLInputElement>) {
@@ -35,7 +46,7 @@ export default function TaskForm({onAdd}: TaskFormProps) {
             return
         }
 
-        onAdd({
+        onSubmit({
             title,
             description: form.description.trim(),
             category: form.category.trim() || 'General',
@@ -43,41 +54,41 @@ export default function TaskForm({onAdd}: TaskFormProps) {
             priority: form.priority,
         })
 
-        setForm(emptyForm)
+        setForm(initialValues)
         setError('')
     }
 
     return (
         <form className="task-form" onSubmit={handleSubmit} noValidate>
-            <h2 className="task-form__heading">New task</h2>
+            {heading && <h2 className="task-form__heading">{heading}</h2>}
 
             <div className="task-form__field">
-                <label className="task-form__label" htmlFor="task-title">
+                <label className="task-form__label" htmlFor={`${id}-title`}>
                     Title
                 </label>
                 <input
-                    id="task-title"
+                    id={`${id}-title`}
                     type="text"
                     className={error ? 'task-form__input task-form__input--invalid' : 'task-form__input'}
                     placeholder="e.g. Learn React hooks"
                     value={form.title}
                     onChange={handleTitleChange}
                     aria-invalid={error !== ''}
-                    aria-describedby={error ? 'task-title-error' : undefined}
+                    aria-describedby={error ? `${id}-title-error` : undefined}
                 />
                 {error && (
-                    <p id="task-title-error" className="task-form__error">
+                    <p id={`${id}-title-error`} className="task-form__error">
                         {error}
                     </p>
                 )}
             </div>
 
             <div className="task-form__field">
-                <label className="task-form__label" htmlFor="task-description">
+                <label className="task-form__label" htmlFor={`${id}-description`}>
                     Description
                 </label>
                 <textarea
-                    id="task-description"
+                    id={`${id}-description`}
                     className="task-form__input task-form__input--multiline"
                     rows={2}
                     placeholder="Short description"
@@ -88,11 +99,11 @@ export default function TaskForm({onAdd}: TaskFormProps) {
 
             <div className="task-form__row">
                 <div className="task-form__field">
-                    <label className="task-form__label" htmlFor="task-category">
+                    <label className="task-form__label" htmlFor={`${id}-category`}>
                         Category
                     </label>
                     <input
-                        id="task-category"
+                        id={`${id}-category`}
                         type="text"
                         className="task-form__input"
                         placeholder="e.g. React"
@@ -102,11 +113,11 @@ export default function TaskForm({onAdd}: TaskFormProps) {
                 </div>
 
                 <div className="task-form__field">
-                    <label className="task-form__label" htmlFor="task-priority">
+                    <label className="task-form__label" htmlFor={`${id}-priority`}>
                         Priority
                     </label>
                     <select
-                        id="task-priority"
+                        id={`${id}-priority`}
                         className="task-form__input"
                         value={form.priority}
                         onChange={(event) => setForm({...form, priority: event.target.value as Priority})}
@@ -125,7 +136,7 @@ export default function TaskForm({onAdd}: TaskFormProps) {
                         <label key={color} className="task-form__swatch-option">
                             <input
                                 type="radio"
-                                name="category-color"
+                                name={`${id}-category-color`}
                                 className="task-form__swatch-input"
                                 value={color}
                                 checked={form.categoryColor === color}
@@ -138,9 +149,16 @@ export default function TaskForm({onAdd}: TaskFormProps) {
                 </div>
             </fieldset>
 
-            <button type="submit" className="task-form__submit">
-                Add
-            </button>
+            <div className="task-form__actions">
+                {onCancel && (
+                    <button type="button" className="task-form__cancel" onClick={onCancel}>
+                        Cancel
+                    </button>
+                )}
+                <button type="submit" className="task-form__submit">
+                    {submitLabel}
+                </button>
+            </div>
         </form>
     )
 }
