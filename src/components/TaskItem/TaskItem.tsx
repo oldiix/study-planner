@@ -9,8 +9,10 @@ type TaskItemProps = {
 }
 
 export default function TaskItem({task}: TaskItemProps) {
-    const {updateTask, toggleTask, deleteTask} = useTaskContext()
+    const {updateTask, toggleTask, requestDelete, pendingDeleteIds} = useTaskContext()
     const [isEditing, setIsEditing] = useState(false)
+
+    const isPendingDelete = pendingDeleteIds.includes(task.id)
 
     function handleSave(changes: NewTask) {
         updateTask(task.id, changes)
@@ -36,7 +38,13 @@ export default function TaskItem({task}: TaskItemProps) {
         )
     }
 
-    const className = task.completed ? 'task-item task-item--completed' : 'task-item'
+    let className = 'task-item'
+    if (task.completed) {
+        className += ' task-item--completed'
+    }
+    if (isPendingDelete) {
+        className += ' task-item--pending'
+    }
 
     return (
         <li className={className}>
@@ -56,20 +64,24 @@ export default function TaskItem({task}: TaskItemProps) {
             </div>
 
             <div className="task-item__actions">
-                <button type="button" className="task-item__button" onClick={() => toggleTask(task.id)}>
-                    {task.completed ? 'Undo' : 'Complete'}
-                </button>
-                <button type="button" className="task-item__button" onClick={() => setIsEditing(true)}>
-                    Edit
-                </button>
-                {task.completed && (
-                    <button
-                        type="button"
-                        className="task-item__button task-item__button--danger"
-                        onClick={() => deleteTask(task.id)}
-                    >
-                        Delete
-                    </button>
+                {isPendingDelete ? (
+                    <span className="task-item__pending-label">Will be deleted</span>
+                ) : (
+                    <>
+                        <button type="button" className="task-item__button" onClick={() => toggleTask(task.id)}>
+                            {task.completed ? 'Reopen' : 'Complete'}
+                        </button>
+                        <button type="button" className="task-item__button" onClick={() => setIsEditing(true)}>
+                            Edit
+                        </button>
+                        <button
+                            type="button"
+                            className="task-item__button task-item__button--danger"
+                            onClick={() => requestDelete(task.id)}
+                        >
+                            Delete
+                        </button>
+                    </>
                 )}
             </div>
         </li>

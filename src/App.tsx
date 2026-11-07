@@ -6,18 +6,37 @@ import TaskList from './components/TaskList/TaskList'
 import TaskSort from './components/TaskSort/TaskSort'
 import TaskStats from './components/TaskStats/TaskStats'
 import Toast from './components/Toast/Toast'
+import {UNDO_DELETE_DURATION} from './constants'
 import {useTaskContext} from './hooks/useTaskContext'
 import './App.scss'
 
 export default function App() {
-    const {tasks, addTask, toast, hideToast} = useTaskContext()
+    const {tasks, pendingDeleteIds, addTask, undoDelete, toast, hideToast} = useTaskContext()
 
     const activeCount = tasks.filter((task) => !task.completed).length
+    const pendingCount = pendingDeleteIds.length
 
     useEffect(() => {
         const label = activeCount === 1 ? 'active task' : 'active tasks'
         document.title = `Study Planner — ${activeCount} ${label}`
     }, [activeCount])
+
+    let toastElement = null
+    if (pendingCount > 0) {
+        toastElement = (
+            <Toast
+                key={`pending-${pendingDeleteIds.join('-')}`}
+                type="info"
+                message={pendingCount === 1 ? 'Task will be deleted' : `${pendingCount} tasks will be deleted`}
+                duration={UNDO_DELETE_DURATION}
+                action={{label: 'Undo', onClick: undoDelete}}
+            />
+        )
+    } else if (toast) {
+        toastElement = (
+            <Toast key={toast.id} message={toast.message} type={toast.type} onClose={hideToast}/>
+        )
+    }
 
     return (
         <div className="app">
@@ -31,9 +50,7 @@ export default function App() {
                 </div>
                 <TaskList/>
             </main>
-            {toast && (
-                <Toast key={toast.id} message={toast.message} type={toast.type} onClose={hideToast}/>
-            )}
+            {toastElement}
         </div>
     )
 }

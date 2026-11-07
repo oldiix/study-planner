@@ -4,6 +4,7 @@ import type {ToastMessage, ToastType} from '../types/toast'
 
 export type TaskContextValue = {
     tasks: Task[]
+    pendingDeleteIds: number[]
     filter: TaskFilter
     setFilter: (filter: TaskFilter) => void
     sortOrder: TaskSortOrder
@@ -11,7 +12,8 @@ export type TaskContextValue = {
     addTask: (task: NewTask) => void
     updateTask: (id: number, changes: NewTask) => void
     toggleTask: (id: number) => void
-    deleteTask: (id: number) => void
+    requestDelete: (id: number) => void
+    undoDelete: () => void
     toast: ToastMessage | null
     showToast: (message: string, type?: ToastType) => void
     hideToast: () => void

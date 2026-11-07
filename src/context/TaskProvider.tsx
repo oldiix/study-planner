@@ -1,5 +1,6 @@
 import {useEffect, useReducer, useState} from 'react'
 import type {ReactNode} from 'react'
+import {UNDO_DELETE_DURATION} from '../constants'
 import {initialTasks} from '../data/initialTasks'
 import {useLocalStorage} from '../hooks/useLocalStorage'
 import {taskReducer} from '../reducers/taskReducer'
@@ -15,13 +16,16 @@ function createInitialState(fallbackTasks: Task[]): TaskState {
     try {
         const saved = localStorage.getItem(TASKS_STORAGE_KEY)
         if (saved === null) {
-            return {tasks: fallbackTasks}
+            return {tasks: fallbackTasks, pendingDeleteIds: []}
         }
 
         const parsed: unknown = JSON.parse(saved)
-        return {tasks: Array.isArray(parsed) ? (parsed as Task[]) : fallbackTasks}
+        return {
+            tasks: Array.isArray(parsed) ? (parsed as Task[]) : fallbackTasks,
+            pendingDeleteIds: [],
+        }
     } catch {
-        return {tasks: fallbackTasks}
+        return {tasks: fallbackTasks, pendingDeleteIds: []}
     }
 }
 
@@ -35,9 +39,11 @@ export default function TaskProvider({children}: TaskProviderProps) {
     const [sortOrder, setSortOrder] = useLocalStorage<TaskSortOrder>('study-planner:sort', 'newest')
     const [toast, setToast] = useState<ToastMessage | null>(null)
 
+    const {tasks, pendingDeleteIds} = state
+
     useEffect(() => {
-        localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(state.tasks))
-    }, [state.tasks])
+        localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks))
+    }, [tasks])
 
     useEffect(() => {
         if (!toast) {
@@ -47,6 +53,24 @@ export default function TaskProvider({children}: TaskProviderProps) {
         const timerId = setTimeout(() => setToast(null), TOAST_DURATION)
         return () => clearTimeout(timerId)
     }, [toast])
+
+    useEffect(() => {
+        if (pendingDeleteIds.length === 0) {
+            return
+        }
+
+        const count = pendingDeleteIds.length
+        const timerId = setTimeout(() => {
+            dispatch({type: 'confirmDelete'})
+            setToast({
+                id: Date.now(),
+                message: count === 1 ? 'Task deleted' : `${count} tasks deleted`,
+                type: 'success',
+            })
+        }, UNDO_DELETE_DURATION)
+
+        return () => clearTimeout(timerId)
+    }, [pendingDeleteIds])
 
     function showToast(message: string, type: ToastType = 'success') {
         setToast({id: Date.now(), message, type})
@@ -71,12 +95,17 @@ export default function TaskProvider({children}: TaskProviderProps) {
         dispatch({type: 'toggle', id})
     }
 
-    function deleteTask(id: number) {
-        dispatch({type: 'delete', id})
+    function requestDelete(id: number) {
+        dispatch({type: 'requestDelete', id})
+    }
+
+    function undoDelete() {
+        dispatch({type: 'undoDelete'})
     }
 
     const value = {
-        tasks: state.tasks,
+        tasks,
+        pendingDeleteIds,
         filter,
         setFilter,
         sortOrder,
@@ -84,7 +113,8 @@ export default function TaskProvider({children}: TaskProviderProps) {
         addTask,
         updateTask,
         toggleTask,
-        deleteTask,
+        requestDelete,
+        undoDelete,
         toast,
         showToast,
         hideToast,
