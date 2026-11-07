@@ -1,10 +1,11 @@
-import {useEffect, useReducer, useState} from 'react'
+import {useEffect, useReducer} from 'react'
 import type {ReactNode} from 'react'
 import {initialTasks} from '../data/initialTasks'
 import {taskReducer} from '../reducers/taskReducer'
 import type {TaskState} from '../reducers/taskReducer'
 import type {NewTask, Task, TaskFilter, TaskSortOrder} from '../types/task'
 import {TaskContext} from './TaskContext'
+import {useLocalStorage} from '../hooks/useLocalStorage'
 
 const TASKS_STORAGE_KEY = 'study-planner:tasks'
 
@@ -28,8 +29,8 @@ type TaskProviderProps = {
 
 export default function TaskProvider({children}: TaskProviderProps) {
     const [state, dispatch] = useReducer(taskReducer, initialTasks, createInitialState)
-    const [filter, setFilter] = useState<TaskFilter>('all')
-    const [sortOrder, setSortOrder] = useState<TaskSortOrder>('newest')
+    const [filter, setFilter] = useLocalStorage<TaskFilter>('study-planner:filter', 'all')
+    const [sortOrder, setSortOrder] = useLocalStorage<TaskSortOrder>('study-planner:sort', 'newest')
 
     useEffect(() => {
         localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(state.tasks))
