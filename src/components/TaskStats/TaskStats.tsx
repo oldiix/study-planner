@@ -1,11 +1,9 @@
-import type {Task} from '../../types/task.ts'
+import {useTaskContext} from '../../hooks/useTaskContext'
 import './TaskStats.scss'
 
-type TaskStatsProps = {
-    tasks: Task[]
-}
+export default function TaskStats() {
+    const {tasks} = useTaskContext()
 
-export default function TaskStats({tasks}: TaskStatsProps) {
     const total = tasks.length
     const completed = tasks.filter((task) => task.completed).length
     const active = total - completed

@@ -1,19 +1,36 @@
-import type {Task} from '../../types/task.ts'
-import TaskItem from '../TaskItem/TaskItem.tsx'
+import {useTaskContext} from '../../hooks/useTaskContext'
+import type {Priority} from '../../types/task'
+import TaskItem from '../TaskItem/TaskItem'
 import './TaskList.scss'
 
-type TaskListProps = {
-    tasks: Task[]
-    hasAnyTasks: boolean
-    onToggle: (id: number) => void
-    onDelete: (id: number) => void
+const priorityRank: Record<Priority, number> = {
+    high: 0,
+    medium: 1,
+    low: 2,
 }
 
-export default function TaskList({tasks, hasAnyTasks, onToggle, onDelete}: TaskListProps) {
-    if (tasks.length === 0) {
+export default function TaskList() {
+    const {tasks, filter, sortOrder} = useTaskContext()
+
+    const filteredTasks = tasks.filter((task) => {
+        if (filter === 'completed') {
+            return task.completed
+        }
+        if (filter === 'active') {
+            return !task.completed
+        }
+        return true
+    })
+
+    const visibleTasks =
+        sortOrder === 'priority'
+            ? [...filteredTasks].sort((a, b) => priorityRank[a.priority] - priorityRank[b.priority])
+            : filteredTasks
+
+    if (visibleTasks.length === 0) {
         return (
             <div className="task-list task-list--empty">
-                {hasAnyTasks ? (
+                {tasks.length > 0 ? (
                     <p className="task-list__empty-title">No tasks match this filter.</p>
                 ) : (
                     <>
@@ -27,8 +44,8 @@ export default function TaskList({tasks, hasAnyTasks, onToggle, onDelete}: TaskL
 
     return (
         <ul className="task-list">
-            {tasks.map((task) => (
-                <TaskItem key={task.id} task={task} onToggle={onToggle} onDelete={onDelete}/>
+            {visibleTasks.map((task) => (
+                <TaskItem key={task.id} task={task}/>
             ))}
         </ul>
     )

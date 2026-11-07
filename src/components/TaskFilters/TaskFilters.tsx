@@ -1,10 +1,6 @@
-import type {TaskFilter} from '../../types/task.ts'
+import {useTaskContext} from '../../hooks/useTaskContext'
+import type {TaskFilter} from '../../types/task'
 import './TaskFilters.scss'
-
-type TaskFiltersProps = {
-    filter: TaskFilter
-    onChange: (filter: TaskFilter) => void
-}
 
 const filterOptions: { value: TaskFilter; label: string }[] = [
     {value: 'all', label: 'All'},
@@ -12,7 +8,9 @@ const filterOptions: { value: TaskFilter; label: string }[] = [
     {value: 'active', label: 'Active'},
 ]
 
-export default function TaskFilters({filter, onChange}: TaskFiltersProps) {
+export default function TaskFilters() {
+    const {filter, setFilter} = useTaskContext()
+
     return (
         <div className="task-filters">
             {filterOptions.map((option) => {
@@ -26,7 +24,7 @@ export default function TaskFilters({filter, onChange}: TaskFiltersProps) {
                             isActive ? 'task-filters__button task-filters__button--active' : 'task-filters__button'
                         }
                         aria-pressed={isActive}
-                        onClick={() => onChange(option.value)}
+                        onClick={() => setFilter(option.value)}
                     >
                         {option.label}
                     </button>

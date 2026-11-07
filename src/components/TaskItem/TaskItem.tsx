@@ -1,13 +1,13 @@
-import type {Task} from '../../types/task.ts'
+import {useTaskContext} from '../../hooks/useTaskContext'
+import type {Task} from '../../types/task'
 import './TaskItem.scss'
 
 type TaskItemProps = {
     task: Task
-    onToggle: (id: number) => void
-    onDelete: (id: number) => void
 }
 
-export default function TaskItem({task, onToggle, onDelete}: TaskItemProps) {
+export default function TaskItem({task}: TaskItemProps) {
+    const {toggleTask, deleteTask} = useTaskContext()
     const className = task.completed ? 'task-item task-item--completed' : 'task-item'
 
     return (
@@ -28,14 +28,14 @@ export default function TaskItem({task, onToggle, onDelete}: TaskItemProps) {
             </div>
 
             <div className="task-item__actions">
-                <button type="button" className="task-item__button" onClick={() => onToggle(task.id)}>
+                <button type="button" className="task-item__button" onClick={() => toggleTask(task.id)}>
                     {task.completed ? 'Undo' : 'Complete'}
                 </button>
                 {task.completed && (
                     <button
                         type="button"
                         className="task-item__button task-item__button--danger"
-                        onClick={() => onDelete(task.id)}
+                        onClick={() => deleteTask(task.id)}
                     >
                         Delete
                     </button>
