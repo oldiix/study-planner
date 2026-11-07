@@ -1,4 +1,4 @@
-import type {TaskFilter} from '../types/task'
+import type {TaskFilter} from '../../types/task.ts'
 import './TaskFilters.scss'
 
 type TaskFiltersProps = {

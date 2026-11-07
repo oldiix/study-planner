@@ -1,6 +1,6 @@
 import {useState} from 'react'
 import type {ChangeEvent, SubmitEvent} from 'react'
-import type {CategoryColor, NewTask, Priority} from '../types/task'
+import type {CategoryColor, NewTask, Priority} from '../../types/task.ts'
 import './TaskForm.scss'
 
 type TaskFormProps = {

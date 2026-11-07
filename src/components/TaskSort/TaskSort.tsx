@@ -1,4 +1,4 @@
-import type {TaskSortOrder} from '../types/task'
+import type {TaskSortOrder} from '../../types/task.ts'
 import './TaskSort.scss'
 
 type TaskSortProps = {
