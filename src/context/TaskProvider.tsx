@@ -1,13 +1,15 @@
-import {useEffect, useReducer} from 'react'
+import {useEffect, useReducer, useState} from 'react'
 import type {ReactNode} from 'react'
 import {initialTasks} from '../data/initialTasks'
+import {useLocalStorage} from '../hooks/useLocalStorage'
 import {taskReducer} from '../reducers/taskReducer'
 import type {TaskState} from '../reducers/taskReducer'
 import type {NewTask, Task, TaskFilter, TaskSortOrder} from '../types/task'
+import type {ToastMessage, ToastType} from '../types/toast'
 import {TaskContext} from './TaskContext'
-import {useLocalStorage} from '../hooks/useLocalStorage'
 
 const TASKS_STORAGE_KEY = 'study-planner:tasks'
+const TOAST_DURATION = 3000
 
 function createInitialState(fallbackTasks: Task[]): TaskState {
     try {
@@ -31,18 +33,38 @@ export default function TaskProvider({children}: TaskProviderProps) {
     const [state, dispatch] = useReducer(taskReducer, initialTasks, createInitialState)
     const [filter, setFilter] = useLocalStorage<TaskFilter>('study-planner:filter', 'all')
     const [sortOrder, setSortOrder] = useLocalStorage<TaskSortOrder>('study-planner:sort', 'newest')
+    const [toast, setToast] = useState<ToastMessage | null>(null)
 
     useEffect(() => {
         localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(state.tasks))
     }, [state.tasks])
 
+    useEffect(() => {
+        if (!toast) {
+            return
+        }
+
+        const timerId = setTimeout(() => setToast(null), TOAST_DURATION)
+        return () => clearTimeout(timerId)
+    }, [toast])
+
+    function showToast(message: string, type: ToastType = 'success') {
+        setToast({id: Date.now(), message, type})
+    }
+
+    function hideToast() {
+        setToast(null)
+    }
+
     function addTask(newTask: NewTask) {
         const task: Task = {...newTask, id: Date.now(), completed: false}
         dispatch({type: 'add', task})
+        showToast('Task added')
     }
 
     function updateTask(id: number, changes: NewTask) {
         dispatch({type: 'update', id, changes})
+        showToast('Task updated')
     }
 
     function toggleTask(id: number) {
@@ -63,6 +85,9 @@ export default function TaskProvider({children}: TaskProviderProps) {
         updateTask,
         toggleTask,
         deleteTask,
+        toast,
+        showToast,
+        hideToast,
     }
 
     return <TaskContext value={value}>{children}</TaskContext>

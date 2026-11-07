@@ -1,5 +1,6 @@
 import {createContext} from 'react'
 import type {NewTask, Task, TaskFilter, TaskSortOrder} from '../types/task'
+import type {ToastMessage, ToastType} from '../types/toast'
 
 export type TaskContextValue = {
     tasks: Task[]
@@ -11,6 +12,9 @@ export type TaskContextValue = {
     updateTask: (id: number, changes: NewTask) => void
     toggleTask: (id: number) => void
     deleteTask: (id: number) => void
+    toast: ToastMessage | null
+    showToast: (message: string, type?: ToastType) => void
+    hideToast: () => void
 }
 
 export const TaskContext = createContext<TaskContextValue | null>(null)

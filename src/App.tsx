@@ -5,11 +5,12 @@ import TaskForm from './components/TaskForm/TaskForm'
 import TaskList from './components/TaskList/TaskList'
 import TaskSort from './components/TaskSort/TaskSort'
 import TaskStats from './components/TaskStats/TaskStats'
+import Toast from './components/Toast/Toast'
 import {useTaskContext} from './hooks/useTaskContext'
 import './App.scss'
 
 export default function App() {
-    const {tasks, addTask} = useTaskContext()
+    const {tasks, addTask, toast, hideToast} = useTaskContext()
 
     const activeCount = tasks.filter((task) => !task.completed).length
 
@@ -30,6 +31,9 @@ export default function App() {
                 </div>
                 <TaskList/>
             </main>
+            {toast && (
+                <Toast key={toast.id} message={toast.message} type={toast.type} onClose={hideToast}/>
+            )}
         </div>
     )
 }
