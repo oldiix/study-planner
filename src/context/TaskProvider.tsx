@@ -103,6 +103,11 @@ export default function TaskProvider({children}: TaskProviderProps) {
         dispatch({type: 'undoDelete'})
     }
 
+    function resetTasks() {
+        dispatch({type: 'reset', tasks: initialTasks})
+        showToast('Data reset', 'info')
+    }
+
     const value = {
         tasks,
         pendingDeleteIds,
@@ -115,6 +120,7 @@ export default function TaskProvider({children}: TaskProviderProps) {
         toggleTask,
         requestDelete,
         undoDelete,
+        resetTasks,
         toast,
         showToast,
         hideToast,

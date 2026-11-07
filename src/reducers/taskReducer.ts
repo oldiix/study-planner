@@ -12,6 +12,7 @@ export type TaskAction =
     | { type: 'requestDelete'; id: number }
     | { type: 'undoDelete' }
     | { type: 'confirmDelete' }
+    | { type: 'reset'; tasks: Task[] }
 
 function removePendingTasks(state: TaskState): Task[] {
     return state.tasks.filter((task) => !state.pendingDeleteIds.includes(task.id))
@@ -52,5 +53,7 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
                 tasks: removePendingTasks(state),
                 pendingDeleteIds: [],
             }
+        case 'reset':
+            return {tasks: action.tasks, pendingDeleteIds: []}
     }
 }

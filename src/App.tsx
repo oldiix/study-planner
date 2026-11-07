@@ -1,5 +1,6 @@
 import {useEffect} from 'react'
 import Header from './components/Header/Header'
+import TaskActions from './components/TaskActions/TaskActions'
 import TaskFilters from './components/TaskFilters/TaskFilters'
 import TaskForm from './components/TaskForm/TaskForm'
 import TaskList from './components/TaskList/TaskList'
@@ -49,6 +50,7 @@ export default function App() {
                     <TaskSort/>
                 </div>
                 <TaskList/>
+                <TaskActions/>
             </main>
             {toastElement}
         </div>
