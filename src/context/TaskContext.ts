@@ -14,6 +14,7 @@ export type TaskContextValue = {
     toggleTask: (id: number) => void
     requestDelete: (id: number) => void
     undoDelete: () => void
+    clearCompleted: () => void
     resetTasks: () => void
     toast: ToastMessage | null
     showToast: (message: string, type?: ToastType) => void

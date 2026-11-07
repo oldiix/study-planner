@@ -103,6 +103,19 @@ export default function TaskProvider({children}: TaskProviderProps) {
         dispatch({type: 'undoDelete'})
     }
 
+    function clearCompleted() {
+        const hasCompleted = tasks.some(
+            (task) => task.completed && !pendingDeleteIds.includes(task.id),
+        )
+
+        if (!hasCompleted) {
+            showToast('No completed tasks to clear', 'error')
+            return
+        }
+
+        dispatch({type: 'clearCompleted'})
+    }
+
     function resetTasks() {
         dispatch({type: 'reset', tasks: initialTasks})
         showToast('Data reset', 'info')
@@ -120,6 +133,7 @@ export default function TaskProvider({children}: TaskProviderProps) {
         toggleTask,
         requestDelete,
         undoDelete,
+        clearCompleted,
         resetTasks,
         toast,
         showToast,

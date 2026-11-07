@@ -12,6 +12,7 @@ export type TaskAction =
     | { type: 'requestDelete'; id: number }
     | { type: 'undoDelete' }
     | { type: 'confirmDelete' }
+    | { type: 'clearCompleted' }
     | { type: 'reset'; tasks: Task[] }
 
 function removePendingTasks(state: TaskState): Task[] {
@@ -53,6 +54,15 @@ export function taskReducer(state: TaskState, action: TaskAction): TaskState {
                 tasks: removePendingTasks(state),
                 pendingDeleteIds: [],
             }
+
+        case 'clearCompleted': {
+            const remainingTasks = removePendingTasks(state)
+            return {
+                tasks: remainingTasks,
+                pendingDeleteIds: remainingTasks.filter((task) => task.completed).map((task) => task.id),
+            }
+        }
+
         case 'reset':
             return {tasks: action.tasks, pendingDeleteIds: []}
     }
