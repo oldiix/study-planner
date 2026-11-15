@@ -104,12 +104,16 @@ export default function TaskProvider({children}: TaskProviderProps) {
             return
         }
 
+        dispatch({type: 'toggle', id})
+
+        if (task.isLocal) {
+            return
+        }
+
         try {
-            if (!task.isLocal) {
-                await taskRepository.update(id, {completed: !task.completed})
-            }
-            dispatch({type: 'toggle', id})
+            await taskRepository.update(id, {completed: !task.completed})
         } catch (error) {
+            dispatch({type: 'toggle', id})
             showToast(getErrorMessage(error), 'error')
         }
     }
