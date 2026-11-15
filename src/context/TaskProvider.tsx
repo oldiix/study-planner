@@ -1,5 +1,6 @@
 import {useEffect, useReducer, useState} from 'react'
 import type {ReactNode} from 'react'
+import {getErrorMessage} from '../api/errors'
 import {isAbortError} from '../api/httpClient'
 import {useLocalStorage} from '../hooks/useLocalStorage'
 import {initialTaskState, taskReducer} from '../reducers/taskReducer'
@@ -10,10 +11,6 @@ import {TaskContext} from './TaskContext'
 
 const PAGE_SIZE = 10
 const TOAST_DURATION = 3000
-
-function getErrorText(error: unknown, fallback: string): string {
-    return error instanceof Error ? error.message : fallback
-}
 
 type TaskProviderProps = {
     children: ReactNode
@@ -39,7 +36,7 @@ export default function TaskProvider({children}: TaskProviderProps) {
                 if (isAbortError(error)) {
                     return
                 }
-                dispatch({type: 'loadError', message: getErrorText(error, 'Failed to load tasks')})
+                dispatch({type: 'loadError', message: getErrorMessage(error)})
             })
 
         return () => controller.abort()
@@ -81,7 +78,7 @@ export default function TaskProvider({children}: TaskProviderProps) {
             dispatch({type: 'add', task: {...created, id: Date.now(), isLocal: true}})
             showToast('Task added')
         } catch (error) {
-            showToast(getErrorText(error, 'Failed to add task'), 'error')
+            showToast(getErrorMessage(error), 'error')
             throw error
         }
     }
@@ -96,7 +93,7 @@ export default function TaskProvider({children}: TaskProviderProps) {
             dispatch({type: 'update', id, changes})
             showToast('Task updated')
         } catch (error) {
-            showToast(getErrorText(error, 'Failed to update task'), 'error')
+            showToast(getErrorMessage(error), 'error')
             throw error
         }
     }
@@ -113,7 +110,7 @@ export default function TaskProvider({children}: TaskProviderProps) {
             }
             dispatch({type: 'toggle', id})
         } catch (error) {
-            showToast(getErrorText(error, 'Failed to update task'), 'error')
+            showToast(getErrorMessage(error), 'error')
         }
     }
 
@@ -127,7 +124,7 @@ export default function TaskProvider({children}: TaskProviderProps) {
             dispatch({type: 'remove', id})
             showToast('Task deleted')
         } catch (error) {
-            showToast(getErrorText(error, 'Failed to delete task'), 'error')
+            showToast(getErrorMessage(error), 'error')
             throw error
         }
     }

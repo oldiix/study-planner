@@ -1,6 +1,7 @@
 import {useEffect, useId, useState} from 'react'
 import type {MouseEvent} from 'react'
 import {createPortal} from 'react-dom'
+import {getErrorMessage} from '../../api/errors'
 import {isAbortError} from '../../api/httpClient'
 import {taskRepository} from '../../repositories/taskRepository'
 import type {Task} from '../../types/task'
@@ -43,10 +44,7 @@ export default function TaskDetails({task, onClose}: TaskDetailsProps) {
                 if (isAbortError(error)) {
                     return
                 }
-                setDetails({
-                    status: 'error',
-                    message: error instanceof Error ? error.message : 'Failed to load the task',
-                })
+                setDetails({status: 'error', message: getErrorMessage(error)})
             })
 
         return () => controller.abort()
