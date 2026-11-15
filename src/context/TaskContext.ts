@@ -1,10 +1,17 @@
 import {createContext} from 'react'
+import type {LoadStatus} from '../reducers/taskReducer'
 import type {NewTask, Task, TaskFilter, TaskSortOrder} from '../types/task'
 import type {ToastMessage, ToastType} from '../types/toast'
 
 export type TaskContextValue = {
     tasks: Task[]
-    pendingDeleteIds: number[]
+    total: number
+    status: LoadStatus
+    error: string | null
+    page: number
+    totalPages: number
+    goToPage: (page: number) => void
+    retry: () => void
     filter: TaskFilter
     setFilter: (filter: TaskFilter) => void
     sortOrder: TaskSortOrder
@@ -12,10 +19,7 @@ export type TaskContextValue = {
     addTask: (task: NewTask) => void
     updateTask: (id: number, changes: NewTask) => void
     toggleTask: (id: number) => void
-    requestDelete: (id: number) => void
-    undoDelete: () => void
-    clearCompleted: () => void
-    resetTasks: () => void
+    deleteTask: (id: number) => void
     toast: ToastMessage | null
     showToast: (message: string, type?: ToastType) => void
     hideToast: () => void

@@ -1,0 +1,27 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+
+  &__button {
+    @include button;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    &:disabled:hover {
+      border-color: $color-border;
+      color: $color-text;
+    }
+  }
+
+  &__info {
+    color: $color-text-muted;
+  }
+}

@@ -1,49 +1,46 @@
 import {useEffect, useReducer, useState} from 'react'
 import type {ReactNode} from 'react'
-import {UNDO_DELETE_DURATION} from '../constants'
-import {initialTasks} from '../data/initialTasks'
+import {isAbortError} from '../api/httpClient'
 import {useLocalStorage} from '../hooks/useLocalStorage'
-import {taskReducer} from '../reducers/taskReducer'
-import type {TaskState} from '../reducers/taskReducer'
+import {initialTaskState, taskReducer} from '../reducers/taskReducer'
+import {taskRepository} from '../repositories/taskRepository'
 import type {NewTask, Task, TaskFilter, TaskSortOrder} from '../types/task'
 import type {ToastMessage, ToastType} from '../types/toast'
 import {TaskContext} from './TaskContext'
 
-const TASKS_STORAGE_KEY = 'study-planner:tasks'
+const PAGE_SIZE = 10
 const TOAST_DURATION = 3000
-
-function createInitialState(fallbackTasks: Task[]): TaskState {
-    try {
-        const saved = localStorage.getItem(TASKS_STORAGE_KEY)
-        if (saved === null) {
-            return {tasks: fallbackTasks, pendingDeleteIds: []}
-        }
-
-        const parsed: unknown = JSON.parse(saved)
-        return {
-            tasks: Array.isArray(parsed) ? (parsed as Task[]) : fallbackTasks,
-            pendingDeleteIds: [],
-        }
-    } catch {
-        return {tasks: fallbackTasks, pendingDeleteIds: []}
-    }
-}
 
 type TaskProviderProps = {
     children: ReactNode
 }
 
 export default function TaskProvider({children}: TaskProviderProps) {
-    const [state, dispatch] = useReducer(taskReducer, initialTasks, createInitialState)
+    const [state, dispatch] = useReducer(taskReducer, initialTaskState)
+    const [page, setPage] = useState(1)
+    const [reloadCount, setReloadCount] = useState(0)
     const [filter, setFilter] = useLocalStorage<TaskFilter>('study-planner:filter', 'all')
     const [sortOrder, setSortOrder] = useLocalStorage<TaskSortOrder>('study-planner:sort', 'newest')
     const [toast, setToast] = useState<ToastMessage | null>(null)
 
-    const {tasks, pendingDeleteIds} = state
+    const totalPages = Math.max(1, Math.ceil(state.total / PAGE_SIZE))
 
     useEffect(() => {
-        localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks))
-    }, [tasks])
+        const controller = new AbortController()
+
+        taskRepository
+            .getAll(page, PAGE_SIZE, controller.signal)
+            .then((result) => dispatch({type: 'loadSuccess', tasks: result.tasks, total: result.total}))
+            .catch((error: unknown) => {
+                if (isAbortError(error)) {
+                    return
+                }
+                const message = error instanceof Error ? error.message : 'Failed to load tasks'
+                dispatch({type: 'loadError', message})
+            })
+
+        return () => controller.abort()
+    }, [page, reloadCount])
 
     useEffect(() => {
         if (!toast) {
@@ -54,23 +51,18 @@ export default function TaskProvider({children}: TaskProviderProps) {
         return () => clearTimeout(timerId)
     }, [toast])
 
-    useEffect(() => {
-        if (pendingDeleteIds.length === 0) {
+    function goToPage(nextPage: number) {
+        if (nextPage < 1 || nextPage > totalPages || nextPage === page) {
             return
         }
+        dispatch({type: 'loadStart'})
+        setPage(nextPage)
+    }
 
-        const count = pendingDeleteIds.length
-        const timerId = setTimeout(() => {
-            dispatch({type: 'confirmDelete'})
-            setToast({
-                id: Date.now(),
-                message: count === 1 ? 'Task deleted' : `${count} tasks deleted`,
-                type: 'success',
-            })
-        }, UNDO_DELETE_DURATION)
-
-        return () => clearTimeout(timerId)
-    }, [pendingDeleteIds])
+    function retry() {
+        dispatch({type: 'loadStart'})
+        setReloadCount((count) => count + 1)
+    }
 
     function showToast(message: string, type: ToastType = 'success') {
         setToast({id: Date.now(), message, type})
@@ -95,35 +87,20 @@ export default function TaskProvider({children}: TaskProviderProps) {
         dispatch({type: 'toggle', id})
     }
 
-    function requestDelete(id: number) {
-        dispatch({type: 'requestDelete', id})
-    }
-
-    function undoDelete() {
-        dispatch({type: 'undoDelete'})
-    }
-
-    function clearCompleted() {
-        const hasCompleted = tasks.some(
-            (task) => task.completed && !pendingDeleteIds.includes(task.id),
-        )
-
-        if (!hasCompleted) {
-            showToast('No completed tasks to clear', 'error')
-            return
-        }
-
-        dispatch({type: 'clearCompleted'})
-    }
-
-    function resetTasks() {
-        dispatch({type: 'reset', tasks: initialTasks})
-        showToast('Data reset', 'info')
+    function deleteTask(id: number) {
+        dispatch({type: 'remove', id})
+        showToast('Task deleted')
     }
 
     const value = {
-        tasks,
-        pendingDeleteIds,
+        tasks: state.tasks,
+        total: state.total,
+        status: state.status,
+        error: state.error,
+        page,
+        totalPages,
+        goToPage,
+        retry,
         filter,
         setFilter,
         sortOrder,
@@ -131,10 +108,7 @@ export default function TaskProvider({children}: TaskProviderProps) {
         addTask,
         updateTask,
         toggleTask,
-        requestDelete,
-        undoDelete,
-        clearCompleted,
-        resetTasks,
+        deleteTask,
         toast,
         showToast,
         hideToast,

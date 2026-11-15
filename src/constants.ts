@@ -1,1 +1,0 @@
-export const UNDO_DELETE_DURATION = 5000
