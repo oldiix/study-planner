@@ -135,6 +135,11 @@
       color: #fff;
       background-color: $color-primary-dark;
     }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
   }
 
   @media (max-width: 560px) {

@@ -10,6 +10,7 @@ export type Task = {
     priority: Priority
     category: string
     categoryColor: CategoryColor
+    isLocal?: boolean
 }
 
 export type NewTask = Omit<Task, 'id' | 'completed'>

@@ -12,7 +12,7 @@ export default function TaskItem({task}: TaskItemProps) {
     const {updateTask, toggleTask, deleteTask} = useTaskContext()
     const [isEditing, setIsEditing] = useState(false)
 
-    function handleSave(changes: NewTask) {
+    async function handleSave(changes: NewTask) {
         updateTask(task.id, changes)
         setIsEditing(false)
     }

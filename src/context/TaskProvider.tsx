@@ -4,7 +4,7 @@ import {isAbortError} from '../api/httpClient'
 import {useLocalStorage} from '../hooks/useLocalStorage'
 import {initialTaskState, taskReducer} from '../reducers/taskReducer'
 import {taskRepository} from '../repositories/taskRepository'
-import type {NewTask, Task, TaskFilter, TaskSortOrder} from '../types/task'
+import type {NewTask, TaskFilter, TaskSortOrder} from '../types/task'
 import type {ToastMessage, ToastType} from '../types/toast'
 import {TaskContext} from './TaskContext'
 
@@ -72,10 +72,15 @@ export default function TaskProvider({children}: TaskProviderProps) {
         setToast(null)
     }
 
-    function addTask(newTask: NewTask) {
-        const task: Task = {...newTask, id: Date.now(), completed: false}
-        dispatch({type: 'add', task})
-        showToast('Task added')
+    async function addTask(newTask: NewTask) {
+        try {
+            const created = await taskRepository.create(newTask)
+            dispatch({type: 'add', task: {...created, id: Date.now(), isLocal: true}})
+            showToast('Task added')
+        } catch (error) {
+            showToast(error instanceof Error ? error.message : 'Failed to add task', 'error')
+            throw error
+        }
     }
 
     function updateTask(id: number, changes: NewTask) {

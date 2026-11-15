@@ -7,7 +7,7 @@ type TaskFormProps = {
     heading?: string
     submitLabel: string
     initialValues?: NewTask
-    onSubmit: (task: NewTask) => void
+    onSubmit: (task: NewTask) => Promise<void>
     onCancel?: () => void
 }
 
@@ -31,13 +31,14 @@ export default function TaskForm({
     const id = useId()
     const [form, setForm] = useState<NewTask>(initialValues)
     const [error, setError] = useState('')
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     function handleTitleChange(event: ChangeEvent<HTMLInputElement>) {
         setForm({...form, title: event.target.value})
         setError('')
     }
 
-    function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
         event.preventDefault()
 
         const title = form.title.trim()
@@ -46,16 +47,22 @@ export default function TaskForm({
             return
         }
 
-        onSubmit({
-            title,
-            description: form.description.trim(),
-            category: form.category.trim() || 'General',
-            categoryColor: form.categoryColor,
-            priority: form.priority,
-        })
-
-        setForm(initialValues)
-        setError('')
+        setIsSubmitting(true)
+        try {
+            await onSubmit({
+                title,
+                description: form.description.trim(),
+                category: form.category.trim() || 'General',
+                categoryColor: form.categoryColor,
+                priority: form.priority,
+            })
+            setForm(initialValues)
+            setError('')
+        } catch {
+            // the error is already shown in a toast, keep the entered values
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (
@@ -155,8 +162,8 @@ export default function TaskForm({
                         Cancel
                     </button>
                 )}
-                <button type="submit" className="task-form__submit">
-                    {submitLabel}
+                <button type="submit" className="task-form__submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Saving...' : submitLabel}
                 </button>
             </div>
         </form>

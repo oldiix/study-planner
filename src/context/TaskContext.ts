@@ -16,7 +16,7 @@ export type TaskContextValue = {
     setFilter: (filter: TaskFilter) => void
     sortOrder: TaskSortOrder
     setSortOrder: (sortOrder: TaskSortOrder) => void
-    addTask: (task: NewTask) => void
+    addTask: (task: NewTask) => Promise<void>
     updateTask: (id: number, changes: NewTask) => void
     toggleTask: (id: number) => void
     deleteTask: (id: number) => void
