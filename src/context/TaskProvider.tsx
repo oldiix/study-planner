@@ -11,6 +11,10 @@ import {TaskContext} from './TaskContext'
 const PAGE_SIZE = 10
 const TOAST_DURATION = 3000
 
+function getErrorText(error: unknown, fallback: string): string {
+    return error instanceof Error ? error.message : fallback
+}
+
 type TaskProviderProps = {
     children: ReactNode
 }
@@ -35,8 +39,7 @@ export default function TaskProvider({children}: TaskProviderProps) {
                 if (isAbortError(error)) {
                     return
                 }
-                const message = error instanceof Error ? error.message : 'Failed to load tasks'
-                dispatch({type: 'loadError', message})
+                dispatch({type: 'loadError', message: getErrorText(error, 'Failed to load tasks')})
             })
 
         return () => controller.abort()
@@ -78,23 +81,55 @@ export default function TaskProvider({children}: TaskProviderProps) {
             dispatch({type: 'add', task: {...created, id: Date.now(), isLocal: true}})
             showToast('Task added')
         } catch (error) {
-            showToast(error instanceof Error ? error.message : 'Failed to add task', 'error')
+            showToast(getErrorText(error, 'Failed to add task'), 'error')
             throw error
         }
     }
 
-    function updateTask(id: number, changes: NewTask) {
-        dispatch({type: 'update', id, changes})
-        showToast('Task updated')
+    async function updateTask(id: number, changes: NewTask) {
+        const task = state.tasks.find((item) => item.id === id)
+
+        try {
+            if (!task?.isLocal) {
+                await taskRepository.update(id, {title: changes.title})
+            }
+            dispatch({type: 'update', id, changes})
+            showToast('Task updated')
+        } catch (error) {
+            showToast(getErrorText(error, 'Failed to update task'), 'error')
+            throw error
+        }
     }
 
-    function toggleTask(id: number) {
-        dispatch({type: 'toggle', id})
+    async function toggleTask(id: number) {
+        const task = state.tasks.find((item) => item.id === id)
+        if (!task) {
+            return
+        }
+
+        try {
+            if (!task.isLocal) {
+                await taskRepository.update(id, {completed: !task.completed})
+            }
+            dispatch({type: 'toggle', id})
+        } catch (error) {
+            showToast(getErrorText(error, 'Failed to update task'), 'error')
+        }
     }
 
-    function deleteTask(id: number) {
-        dispatch({type: 'remove', id})
-        showToast('Task deleted')
+    async function deleteTask(id: number) {
+        const task = state.tasks.find((item) => item.id === id)
+
+        try {
+            if (!task?.isLocal) {
+                await taskRepository.delete(id)
+            }
+            dispatch({type: 'remove', id})
+            showToast('Task deleted')
+        } catch (error) {
+            showToast(getErrorText(error, 'Failed to delete task'), 'error')
+            throw error
+        }
     }
 
     const value = {

@@ -17,9 +17,9 @@ export type TaskContextValue = {
     sortOrder: TaskSortOrder
     setSortOrder: (sortOrder: TaskSortOrder) => void
     addTask: (task: NewTask) => Promise<void>
-    updateTask: (id: number, changes: NewTask) => void
-    toggleTask: (id: number) => void
-    deleteTask: (id: number) => void
+    updateTask: (id: number, changes: NewTask) => Promise<void>
+    toggleTask: (id: number) => Promise<void>
+    deleteTask: (id: number) => Promise<void>
     toast: ToastMessage | null
     showToast: (message: string, type?: ToastType) => void
     hideToast: () => void

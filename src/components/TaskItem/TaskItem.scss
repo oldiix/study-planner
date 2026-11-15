@@ -91,12 +91,24 @@
     gap: 8px;
   }
 
+  &__confirm-text {
+    align-self: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $color-danger;
+  }
+
   &__button {
     @include button;
 
     &--danger:hover {
       border-color: $color-danger;
       color: $color-danger;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: wait;
     }
   }
 

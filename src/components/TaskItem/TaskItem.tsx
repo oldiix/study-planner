@@ -11,10 +11,28 @@ type TaskItemProps = {
 export default function TaskItem({task}: TaskItemProps) {
     const {updateTask, toggleTask, deleteTask} = useTaskContext()
     const [isEditing, setIsEditing] = useState(false)
+    const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
+    const [isBusy, setIsBusy] = useState(false)
 
     async function handleSave(changes: NewTask) {
-        updateTask(task.id, changes)
+        await updateTask(task.id, changes)
         setIsEditing(false)
+    }
+
+    async function handleToggle() {
+        setIsBusy(true)
+        await toggleTask(task.id)
+        setIsBusy(false)
+    }
+
+    async function handleDelete() {
+        setIsBusy(true)
+        try {
+            await deleteTask(task.id)
+        } catch {
+            setIsBusy(false)
+            setIsConfirmingDelete(false)
+        }
     }
 
     if (isEditing) {
@@ -56,19 +74,54 @@ export default function TaskItem({task}: TaskItemProps) {
             </div>
 
             <div className="task-item__actions">
-                <button type="button" className="task-item__button" onClick={() => toggleTask(task.id)}>
-                    {task.completed ? 'Reopen' : 'Complete'}
-                </button>
-                <button type="button" className="task-item__button" onClick={() => setIsEditing(true)}>
-                    Edit
-                </button>
-                <button
-                    type="button"
-                    className="task-item__button task-item__button--danger"
-                    onClick={() => deleteTask(task.id)}
-                >
-                    Delete
-                </button>
+                {isConfirmingDelete ? (
+                    <>
+                        <span className="task-item__confirm-text">Delete this task?</span>
+                        <button
+                            type="button"
+                            className="task-item__button task-item__button--danger"
+                            onClick={handleDelete}
+                            disabled={isBusy}
+                        >
+                            {isBusy ? 'Deleting...' : 'Yes'}
+                        </button>
+                        <button
+                            type="button"
+                            className="task-item__button"
+                            onClick={() => setIsConfirmingDelete(false)}
+                            disabled={isBusy}
+                        >
+                            No
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <button
+                            type="button"
+                            className="task-item__button"
+                            onClick={handleToggle}
+                            disabled={isBusy}
+                        >
+                            {task.completed ? 'Reopen' : 'Complete'}
+                        </button>
+                        <button
+                            type="button"
+                            className="task-item__button"
+                            onClick={() => setIsEditing(true)}
+                            disabled={isBusy}
+                        >
+                            Edit
+                        </button>
+                        <button
+                            type="button"
+                            className="task-item__button task-item__button--danger"
+                            onClick={() => setIsConfirmingDelete(true)}
+                            disabled={isBusy}
+                        >
+                            Delete
+                        </button>
+                    </>
+                )}
             </div>
         </li>
     )
