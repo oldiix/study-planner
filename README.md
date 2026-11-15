@@ -2,25 +2,27 @@
 
 A study task planner built with React and TypeScript.
 
-This branch contains **Lab 09 — React State and Effects**: `useReducer`, Context API, `useEffect`, custom hooks and
-`localStorage` persistence. It continues Lab 08 without losing its features.
+This branch contains **Lab 10 — React and REST API**: an API layer, the Repository pattern, asynchronous states, CRUD,
+pagination and request cancellation. Tasks are loaded from the [DummyJSON Todos API](https://dummyjson.com/docs/todos).
 
 ## Features
 
-- Add, edit and complete study tasks
-- Undoable delete with a 5-second timer, progress bar and Undo button
-- Clear all completed tasks with Undo
-- Reset tasks to the initial data
-- Filter (All, Completed, Active) and sort by priority
-- Statistics: total, completed and active tasks
-- Toast notifications for create, edit, delete and errors
-- Tasks, filter and sort order are saved in `localStorage`
-- Browser tab title shows the number of active tasks
+- Load tasks from the REST API with pagination
+- Loading, error (with Try again), empty and success states
+- Task details in a modal loaded by `id`
+- Create, edit, complete and delete tasks through the API
+- Delete confirmation inside the task card
+- Previous GET requests are cancelled with `AbortController`
+- Optimistic update when completing a task
+- Centralized error messages
+- Toast notifications
+- Filter and sort order are saved in `localStorage`
 
 ## Tech stack
 
 - React 19, TypeScript
 - Vite
+- Fetch API
 - SCSS with BEM naming
 - ESLint
 
@@ -28,8 +30,13 @@ This branch contains **Lab 09 — React State and Effects**: `useReducer`, Conte
 
 ```bash
 npm install
+cp .env.example .env
 npm run dev
 ```
+
+| Variable       | Example                 | Description              |
+|----------------|-------------------------|--------------------------|
+| `VITE_API_URL` | `https://dummyjson.com` | base URL of the REST API |
 
 | Script          | Description                         |
 |-----------------|-------------------------------------|
@@ -37,44 +44,62 @@ npm run dev
 | `npm run build` | type-check and build for production |
 | `npm run lint`  | run ESLint                          |
 
-## State management
+## Architecture
 
 ```
-main.tsx
-└── TaskProvider       useReducer (tasks, pendingDeleteIds)
-    │                  useLocalStorage (filter, sortOrder)
-    │                  useState (toast)
-    │                  effects: save tasks, hide toast, undo delete timer
-    └── App            document.title effect, toast rendering
-        ├── TaskForm
-        ├── TaskStats    ← useTaskContext
-        ├── TaskFilters  ← useTaskContext
-        ├── TaskSort     ← useTaskContext
-        ├── TaskList     ← useTaskContext
-        │   └── TaskItem ← useTaskContext + local editing state
-        └── TaskActions  ← useTaskContext
+React components        show data and react to user actions
+      ↓
+TaskProvider            server state (useReducer), client state, async operations
+      ↓
+taskRepository          endpoints, DTO ↔ Task mapping
+      ↓
+httpClient              fetch, VITE_API_URL, response.ok, HttpError
+      ↓
+DummyJSON REST API
 ```
 
-- `taskReducer` is a pure function that handles `add`, `update`, `toggle`, `requestDelete`, `undoDelete`,
-  `confirmDelete`, `clearCompleted` and `reset`.
-- `TaskProvider` shares state and actions through `TaskContext`. Components use `useTaskContext()` instead of props
-  passed through several levels.
-- Side effects (saving to `localStorage`, timers, `document.title`) live in `useEffect`, never in the reducer.
-- Filtered and sorted tasks and statistics are calculated during rendering.
+Components never build URLs or call `fetch` directly.
+
+| Method | Endpoint                 | Repository method             |
+|--------|--------------------------|-------------------------------|
+| GET    | `/todos?limit=10&skip=0` | `getAll(page, limit, signal)` |
+| GET    | `/todos/:id`             | `getById(id, signal)`         |
+| POST   | `/todos/add`             | `create(task)`                |
+| PATCH  | `/todos/:id`             | `update(id, changes)`         |
+| DELETE | `/todos/:id`             | `delete(id)`                  |
+
+## State
+
+| State                                                   | Kind         | Where                          |
+|---------------------------------------------------------|--------------|--------------------------------|
+| tasks of the current page, total, loading status, error | server state | `useReducer` in `TaskProvider` |
+| task details                                            | server state | local state of `TaskDetails`   |
+| current page                                            | client state | `useState` in `TaskProvider`   |
+| filter, sort order                                      | client state | `useLocalStorage`              |
+| form values, editing, delete confirmation               | client state | local state of components      |
+
+## DummyJSON limitations
+
+- POST, PATCH and DELETE are simulated: the server responds, but nothing is saved. The app updates its own state after a
+  successful response.
+- Every created todo gets the same `id` from the server. Created tasks get a unique local `id`, are marked as local and
+  are changed only in the app.
+- `description`, `category`, `categoryColor` and `priority` are not supported by the API and are stored only on the
+  client.
 
 ## Project structure
 
 ```
 src/
-├── components/     Header, TaskActions, TaskFilters, TaskForm, TaskItem,
-│                   TaskList, TaskSort, TaskStats, Toast (each with its own .scss)
+├── api/            httpClient.ts, errors.ts
+├── repositories/   taskRepository.ts
+├── components/     Header, Pagination, StatusMessage, TaskDetails, TaskFilters,
+│                   TaskForm, TaskItem, TaskList, TaskSort, TaskStats, Toast
 ├── context/        TaskContext.ts, TaskProvider.tsx
-├── data/           initialTasks.ts
 ├── hooks/          useLocalStorage.ts, useTaskContext.ts
 ├── reducers/       taskReducer.ts
 ├── styles/         _variables.scss, _mixins.scss, global.scss
-├── types/          task.ts, toast.ts
-├── constants.ts
+├── types/          api.ts, task.ts, toast.ts
 ├── App.tsx
 └── main.tsx
 ```
@@ -86,3 +111,4 @@ src/
 | `main`                       | Vite starter project             |
 | `feature/react-fundamentals` | Lab 08 — React Fundamentals      |
 | `feature/state-effects`      | Lab 09 — React State and Effects |
+| `feature/rest-api`           | Lab 10 — React and REST API      |
