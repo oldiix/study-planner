@@ -1,8 +1,7 @@
 import {useState} from 'react'
 import {Link, useLocation} from 'react-router'
 import {useTaskContext} from '../../hooks/useTaskContext'
-import type {NewTask, Task} from '../../types/task'
-import TaskForm from '../TaskForm/TaskForm'
+import type {Task} from '../../types/task'
 import './TaskItem.scss'
 
 type TaskItemProps = {
@@ -10,16 +9,10 @@ type TaskItemProps = {
 }
 
 export default function TaskItem({task}: TaskItemProps) {
-    const {updateTask, toggleTask, deleteTask} = useTaskContext()
+    const {toggleTask, deleteTask} = useTaskContext()
     const location = useLocation()
-    const [isEditing, setIsEditing] = useState(false)
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
     const [isBusy, setIsBusy] = useState(false)
-
-    async function handleSave(changes: NewTask) {
-        await updateTask(task.id, changes)
-        setIsEditing(false)
-    }
 
     async function handleToggle() {
         setIsBusy(true)
@@ -35,25 +28,6 @@ export default function TaskItem({task}: TaskItemProps) {
             setIsBusy(false)
             setIsConfirmingDelete(false)
         }
-    }
-
-    if (isEditing) {
-        return (
-            <li className="task-item task-item--editing">
-                <TaskForm
-                    submitLabel="Save"
-                    initialValues={{
-                        title: task.title,
-                        description: task.description,
-                        category: task.category,
-                        categoryColor: task.categoryColor,
-                        priority: task.priority,
-                    }}
-                    onSubmit={handleSave}
-                    onCancel={() => setIsEditing(false)}
-                />
-            </li>
-        )
     }
 
     const className = task.completed ? 'task-item task-item--completed' : 'task-item'
@@ -73,12 +47,12 @@ export default function TaskItem({task}: TaskItemProps) {
                 {task.description && <p className="task-item__description">{task.description}</p>}
 
                 <div className="task-item__meta">
-          <span className={`task-item__category task-item__category--${task.categoryColor}`}>
-            {task.category}
-          </span>
+                    <span className={`task-item__category task-item__category--${task.categoryColor}`}>
+                        {task.category}
+                    </span>
                     <span className={`task-item__priority task-item__priority--${task.priority}`}>
-            {task.priority}
-          </span>
+                        {task.priority}
+                    </span>
                     <span className="task-item__status">{task.completed ? 'Completed' : 'In progress'}</span>
                 </div>
             </div>
@@ -116,14 +90,6 @@ export default function TaskItem({task}: TaskItemProps) {
                         </button>
                         <button
                             type="button"
-                            className="task-item__button"
-                            onClick={() => setIsEditing(true)}
-                            disabled={isBusy}
-                        >
-                            Edit
-                        </button>
-                        <button
-                            type="button"
                             className="task-item__button task-item__button--danger"
                             onClick={() => setIsConfirmingDelete(true)}
                             disabled={isBusy}
@@ -133,7 +99,6 @@ export default function TaskItem({task}: TaskItemProps) {
                     </>
                 )}
             </div>
-
         </li>
     )
 }

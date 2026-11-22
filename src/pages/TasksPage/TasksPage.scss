@@ -1,9 +1,18 @@
 @use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
 
 .tasks-page {
   display: flex;
   flex-direction: column;
   gap: 24px;
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
 
   &__title {
     margin: 0;
@@ -14,6 +23,24 @@
   &__subtitle {
     margin: 4px 0 0;
     color: $color-text-muted;
+  }
+
+  &__add {
+    @include button;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-color: $color-primary;
+    font-weight: 600;
+    color: #fff;
+    background-color: $color-primary;
+
+    &:hover {
+      border-color: $color-primary-dark;
+      color: #fff;
+      background-color: $color-primary-dark;
+    }
   }
 
   &__toolbar {

@@ -2,16 +2,30 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
 
-.task-form {
-  @include card;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 20px;
+.task-form-dialog {
+  width: min(520px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  padding: 24px;
+  border: 1px solid $color-border;
+  border-radius: $radius-lg;
+  color: $color-text;
+  background-color: $color-surface;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18);
 
-  &__heading {
-    margin: 0;
-    font-size: 1.1rem;
+  &::backdrop {
+    background-color: rgba(0, 0, 0, 0.35);
+  }
+
+  &__title {
+    margin: 0 0 20px;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 
   &__row {
@@ -116,11 +130,17 @@
     display: flex;
     justify-content: flex-end;
     gap: 8px;
+    margin-top: 8px;
   }
 
   &__cancel {
     @include button;
     padding: 8px 20px;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
 
   &__submit {
@@ -151,5 +171,4 @@
       flex: 1;
     }
   }
-
 }
