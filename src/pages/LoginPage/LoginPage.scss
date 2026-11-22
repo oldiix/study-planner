@@ -32,6 +32,15 @@
     background-color: $color-bg;
   }
 
+  &__notice {
+    margin: 0 0 16px;
+    padding: 10px 12px;
+    border-radius: $radius;
+    font-size: 0.9rem;
+    color: $color-primary-dark;
+    background-color: $color-primary-light;
+  }
+
   &__form {
     display: flex;
     flex-direction: column;

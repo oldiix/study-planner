@@ -1,6 +1,6 @@
 import {useForm} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod'
-import {Navigate} from 'react-router'
+import {Navigate, useLocation} from 'react-router'
 import {getErrorMessage} from '../../api/errors'
 import {useAuth} from '../../hooks/useAuth'
 import {useTaskContext} from '../../hooks/useTaskContext'
@@ -8,9 +8,15 @@ import {loginSchema} from '../../schemas/authSchema'
 import type {LoginFormData} from '../../schemas/authSchema'
 import './LoginPage.scss'
 
+type LoginLocationState = {
+    from?: string
+} | null
+
 export default function LoginPage() {
     const {isAuthenticated, login} = useAuth()
     const {showToast} = useTaskContext()
+    const location = useLocation()
+    const from = (location.state as LoginLocationState)?.from
     const {
         register,
         handleSubmit,
@@ -31,7 +37,7 @@ export default function LoginPage() {
     }
 
     if (isAuthenticated) {
-        return <Navigate to="/profile" replace/>
+        return <Navigate to={from ?? '/profile'} replace/>
     }
 
     return (
@@ -42,6 +48,12 @@ export default function LoginPage() {
                     Test account: <code className="login-page__code">emilys</code> /{' '}
                     <code className="login-page__code">emilyspass</code>
                 </p>
+
+                {from && (
+                    <p className="login-page__notice" role="status">
+                        Please log in to continue.
+                    </p>
+                )}
 
                 <form className="login-page__form" onSubmit={handleSubmit(onSubmit)} noValidate>
                     <div className="login-page__field">
