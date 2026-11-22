@@ -1,3 +1,5 @@
+import {tokenStorage} from './tokenStorage'
+
 const BASE_URL = import.meta.env.VITE_API_URL
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -31,10 +33,24 @@ async function readErrorMessage(response: Response): Promise<string> {
     }
 }
 
+function createHeaders(hasBody: boolean): Record<string, string> {
+    const headers: Record<string, string> = {}
+
+    if (hasBody) {
+        headers['Content-Type'] = 'application/json'
+    }
+    const token = tokenStorage.get()
+    if (token) {
+        headers.Authorization = `Bearer ${token}`
+    }
+
+    return headers
+}
+
 async function request<T>(path: string, {method = 'GET', body, signal}: RequestOptions = {}): Promise<T> {
     const response = await fetch(`${BASE_URL}${path}`, {
         method,
-        headers: body === undefined ? undefined : {'Content-Type': 'application/json'},
+        headers: createHeaders(body !== undefined),
         body: body === undefined ? undefined : JSON.stringify(body),
         signal,
     })

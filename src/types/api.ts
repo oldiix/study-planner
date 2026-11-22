@@ -11,3 +11,17 @@ export type TodosResponse = {
     skip: number
     limit: number
 }
+
+export type ApiUser = {
+    id: number
+    username: string
+    email: string
+    firstName: string
+    lastName: string
+    image: string
+}
+
+export type ApiLoginResponse = ApiUser & {
+    accessToken: string
+    refreshToken: string
+}
