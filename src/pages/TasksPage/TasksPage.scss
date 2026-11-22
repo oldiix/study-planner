@@ -1,0 +1,26 @@
+@use '../../styles/variables' as *;
+
+.tasks-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  &__title {
+    margin: 0;
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    margin: 4px 0 0;
+    color: $color-text-muted;
+  }
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+}

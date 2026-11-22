@@ -1,17 +1,56 @@
 @use '../../styles/variables' as *;
 
 .header {
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid $color-border;
 
-  &__title {
-    margin: 0;
-    font-size: 2rem;
+  &__brand {
+    font-size: 1.4rem;
+    font-weight: 700;
     letter-spacing: -0.02em;
     color: $color-primary;
+    text-decoration: none;
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: 4px;
+      border-radius: $radius;
+    }
   }
 
-  &__subtitle {
-    margin: 4px 0 0;
+  &__nav {
+    display: flex;
+    gap: 4px;
+  }
+
+  &__link {
+    padding: 6px 14px;
+    border-radius: 999px;
     color: $color-text-muted;
+    text-decoration: none;
+    transition: color $transition,
+    background-color $transition;
+
+    &:hover {
+      color: $color-text;
+      background-color: rgba($color-text, 0.06);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: 2px;
+    }
+
+    &--active,
+    &--active:hover {
+      font-weight: 600;
+      color: $color-primary;
+      background-color: $color-primary-light;
+    }
   }
 }

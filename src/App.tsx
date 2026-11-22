@@ -1,41 +1,21 @@
-import {useEffect} from 'react'
-import Header from './components/Header/Header'
-import Pagination from './components/Pagination/Pagination'
-import TaskFilters from './components/TaskFilters/TaskFilters'
-import TaskForm from './components/TaskForm/TaskForm'
-import TaskList from './components/TaskList/TaskList'
-import TaskSort from './components/TaskSort/TaskSort'
-import TaskStats from './components/TaskStats/TaskStats'
-import Toast from './components/Toast/Toast'
-import {useTaskContext} from './hooks/useTaskContext'
-import './App.scss'
+import {Navigate, Route, Routes} from 'react-router'
+import AppLayout from './layouts/AppLayout'
+import LoginPage from './pages/LoginPage/LoginPage'
+import ProfilePage from './pages/ProfilePage/ProfilePage'
+import TaskDetailsPage from './pages/TaskDetailsPage/TaskDetailsPage'
+import TasksPage from './pages/TasksPage/TasksPage'
 
 export default function App() {
-    const {tasks, addTask, toast, hideToast} = useTaskContext()
-
-    const activeCount = tasks.filter((task) => !task.completed).length
-
-    useEffect(() => {
-        const label = activeCount === 1 ? 'active task' : 'active tasks'
-        document.title = `Study Planner — ${activeCount} ${label}`
-    }, [activeCount])
-
     return (
-        <div className="app">
-            <Header/>
-            <main className="app__main">
-                <TaskForm heading="New task" submitLabel="Add" onSubmit={addTask}/>
-                <TaskStats/>
-                <div className="app__toolbar">
-                    <TaskFilters/>
-                    <TaskSort/>
-                </div>
-                <TaskList/>
-                <Pagination/>
-            </main>
-            {toast && (
-                <Toast key={toast.id} message={toast.message} type={toast.type} onClose={hideToast}/>
-            )}
-        </div>
+        <Routes>
+            <Route element={<AppLayout/>}>
+                <Route index element={<Navigate to="/tasks" replace/>}/>
+                <Route path="tasks" element={<TasksPage/>}/>
+                <Route path="tasks/:taskId" element={<TaskDetailsPage/>}/>
+                <Route path="login" element={<LoginPage/>}/>
+                <Route path="profile" element={<ProfilePage/>}/>
+                <Route path="*" element={<Navigate to="/tasks" replace/>}/>
+            </Route>
+        </Routes>
     )
 }
