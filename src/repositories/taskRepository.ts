@@ -5,6 +5,10 @@ import type {NewTask, Task} from '../types/task'
 const RESOURCE = '/todos'
 const DEFAULT_USER_ID = 1
 
+function toCreatedBy(userId: number): string {
+    return `User #${userId}`
+}
+
 export type TaskPage = {
     tasks: Task[]
     total: number
@@ -18,9 +22,11 @@ function toTask(todo: ApiTodo): Task {
         title: todo.todo,
         description: '',
         completed: todo.completed,
+        createdBy: toCreatedBy(todo.userId),
         priority: 'medium',
         category: 'General',
         categoryColor: 'indigo',
+        createdAt: null,
     }
 }
 
@@ -45,7 +51,13 @@ export const taskRepository = {
             completed: false,
             userId: DEFAULT_USER_ID,
         })
-        return {...task, id: created.id, completed: created.completed}
+        return {
+            ...task,
+            id: created.id,
+            completed: created.completed,
+            createdBy: toCreatedBy(created.userId),
+            createdAt: null,
+        }
     },
 
     async update(id: number, changes: TaskChanges): Promise<Task> {

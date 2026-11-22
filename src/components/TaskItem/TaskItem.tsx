@@ -1,7 +1,7 @@
 import {useState} from 'react'
+import {Link} from 'react-router'
 import {useTaskContext} from '../../hooks/useTaskContext'
 import type {NewTask, Task} from '../../types/task'
-import TaskDetails from '../TaskDetails/TaskDetails'
 import TaskForm from '../TaskForm/TaskForm'
 import './TaskItem.scss'
 
@@ -14,7 +14,6 @@ export default function TaskItem({task}: TaskItemProps) {
     const [isEditing, setIsEditing] = useState(false)
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
     const [isBusy, setIsBusy] = useState(false)
-    const [isDetailsOpen, setIsDetailsOpen] = useState(false)
 
     async function handleSave(changes: NewTask) {
         await updateTask(task.id, changes)
@@ -62,13 +61,9 @@ export default function TaskItem({task}: TaskItemProps) {
         <li className={className}>
             <div className="task-item__content">
                 <h3 className="task-item__title">
-                    <button
-                        type="button"
-                        className="task-item__title-button"
-                        onClick={() => setIsDetailsOpen(true)}
-                    >
+                    <Link to={`/tasks/${task.id}`} className="task-item__title-link">
                         {task.title}
-                    </button>
+                    </Link>
                 </h3>
                 {task.description && <p className="task-item__description">{task.description}</p>}
 
@@ -134,7 +129,6 @@ export default function TaskItem({task}: TaskItemProps) {
                 )}
             </div>
 
-            {isDetailsOpen && <TaskDetails task={task} onClose={() => setIsDetailsOpen(false)}/>}
         </li>
     )
 }

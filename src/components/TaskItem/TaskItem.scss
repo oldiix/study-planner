@@ -22,14 +22,9 @@
     transition: color $transition;
   }
 
-  &__title-button {
-    padding: 0;
-    border: 0;
-    font: inherit;
+  &__title-link {
     color: inherit;
-    text-align: left;
-    background: none;
-    cursor: pointer;
+    text-decoration: none;
 
     &:hover {
       color: $color-primary;
@@ -138,7 +133,7 @@
   }
 
   &--completed &__title,
-  &--completed &__title-button {
+  &--completed &__title-link {
     color: $color-text-muted;
     text-decoration: line-through;
   }

@@ -75,7 +75,10 @@ export default function TaskProvider({children}: TaskProviderProps) {
     async function addTask(newTask: NewTask) {
         try {
             const created = await taskRepository.create(newTask)
-            dispatch({type: 'add', task: {...created, id: Date.now(), isLocal: true}})
+            dispatch({
+                type: 'add',
+                task: {...created, id: Date.now(), isLocal: true, createdAt: new Date().toISOString()},
+            })
             showToast('Task added')
         } catch (error) {
             showToast(getErrorMessage(error), 'error')
