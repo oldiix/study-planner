@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {Link} from 'react-router'
+import {Link, useLocation} from 'react-router'
 import {useTaskContext} from '../../hooks/useTaskContext'
 import type {NewTask, Task} from '../../types/task'
 import TaskForm from '../TaskForm/TaskForm'
@@ -11,6 +11,7 @@ type TaskItemProps = {
 
 export default function TaskItem({task}: TaskItemProps) {
     const {updateTask, toggleTask, deleteTask} = useTaskContext()
+    const location = useLocation()
     const [isEditing, setIsEditing] = useState(false)
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
     const [isBusy, setIsBusy] = useState(false)
@@ -61,7 +62,11 @@ export default function TaskItem({task}: TaskItemProps) {
         <li className={className}>
             <div className="task-item__content">
                 <h3 className="task-item__title">
-                    <Link to={`/tasks/${task.id}`} className="task-item__title-link">
+                    <Link
+                        to={`/tasks/${task.id}`}
+                        state={{backTo: `${location.pathname}${location.search}`}}
+                        className="task-item__title-link"
+                    >
                         {task.title}
                     </Link>
                 </h3>

@@ -1,8 +1,18 @@
 import {useTaskContext} from '../../hooks/useTaskContext'
+import {useTaskQuery} from '../../hooks/useTaskQuery'
 import './Pagination.scss'
 
 export default function Pagination() {
-    const {page, totalPages, goToPage} = useTaskContext()
+    const {totalPages} = useTaskContext()
+    const {query, updateQuery} = useTaskQuery()
+    const page = query.page
+
+    function goToPage(nextPage: number) {
+        if (nextPage < 1 || nextPage > totalPages) {
+            return
+        }
+        updateQuery({page: nextPage})
+    }
 
     return (
         <nav className="pagination" aria-label="Pagination">
@@ -10,18 +20,18 @@ export default function Pagination() {
                 type="button"
                 className="pagination__button"
                 onClick={() => goToPage(page - 1)}
-                disabled={page === 1}
+                disabled={page <= 1}
             >
                 Previous
             </button>
             <span className="pagination__info">
-        Page {page} of {totalPages}
-      </span>
+                Page {page} of {totalPages}
+            </span>
             <button
                 type="button"
                 className="pagination__button"
                 onClick={() => goToPage(page + 1)}
-                disabled={page === totalPages}
+                disabled={page >= totalPages}
             >
                 Next
             </button>

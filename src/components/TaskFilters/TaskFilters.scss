@@ -4,7 +4,14 @@
 .task-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
+
+  &__group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 
   &__button {
     @include button;
@@ -16,6 +23,20 @@
       border-color: $color-primary;
       color: #fff;
       background-color: $color-primary;
+    }
+  }
+
+  &__select {
+    padding: 6px 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius;
+    color: $color-text;
+    background-color: $color-surface;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: 2px;
     }
   }
 }

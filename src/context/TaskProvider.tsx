@@ -1,15 +1,14 @@
-import {useEffect, useReducer, useState} from 'react'
+import {useCallback, useEffect, useReducer, useState} from 'react'
 import type {ReactNode} from 'react'
 import {getErrorMessage} from '../api/errors'
 import {isAbortError} from '../api/httpClient'
-import {useLocalStorage} from '../hooks/useLocalStorage'
+import {PAGE_SIZE} from '../constants'
 import {initialTaskState, taskReducer} from '../reducers/taskReducer'
 import {taskRepository} from '../repositories/taskRepository'
-import type {NewTask, TaskFilter, TaskSortOrder} from '../types/task'
+import type {NewTask} from '../types/task'
 import type {ToastMessage, ToastType} from '../types/toast'
 import {TaskContext} from './TaskContext'
 
-const PAGE_SIZE = 10
 const TOAST_DURATION = 3000
 
 type TaskProviderProps = {
@@ -18,29 +17,21 @@ type TaskProviderProps = {
 
 export default function TaskProvider({children}: TaskProviderProps) {
     const [state, dispatch] = useReducer(taskReducer, initialTaskState)
-    const [page, setPage] = useState(1)
-    const [reloadCount, setReloadCount] = useState(0)
-    const [filter, setFilter] = useLocalStorage<TaskFilter>('study-planner:filter', 'all')
-    const [sortOrder, setSortOrder] = useLocalStorage<TaskSortOrder>('study-planner:sort', 'newest')
     const [toast, setToast] = useState<ToastMessage | null>(null)
 
     const totalPages = Math.max(1, Math.ceil(state.total / PAGE_SIZE))
 
-    useEffect(() => {
-        const controller = new AbortController()
-
-        taskRepository
-            .getAll(page, PAGE_SIZE, controller.signal)
-            .then((result) => dispatch({type: 'loadSuccess', tasks: result.tasks, total: result.total}))
-            .catch((error: unknown) => {
-                if (isAbortError(error)) {
-                    return
-                }
-                dispatch({type: 'loadError', message: getErrorMessage(error)})
-            })
-
-        return () => controller.abort()
-    }, [page, reloadCount])
+    const loadTasks = useCallback(async (page: number, signal: AbortSignal) => {
+        try {
+            const result = await taskRepository.getAll(page, PAGE_SIZE, signal)
+            dispatch({type: 'loadSuccess', page, tasks: result.tasks, total: result.total})
+        } catch (error) {
+            if (isAbortError(error)) {
+                return
+            }
+            dispatch({type: 'loadError', page, message: getErrorMessage(error)})
+        }
+    }, [])
 
     useEffect(() => {
         if (!toast) {
@@ -51,17 +42,8 @@ export default function TaskProvider({children}: TaskProviderProps) {
         return () => clearTimeout(timerId)
     }, [toast])
 
-    function goToPage(nextPage: number) {
-        if (nextPage < 1 || nextPage > totalPages || nextPage === page) {
-            return
-        }
-        dispatch({type: 'loadStart'})
-        setPage(nextPage)
-    }
-
     function retry() {
-        dispatch({type: 'loadStart'})
-        setReloadCount((count) => count + 1)
+        dispatch({type: 'clearLoadError'})
     }
 
     function showToast(message: string, type: ToastType = 'success') {
@@ -139,16 +121,11 @@ export default function TaskProvider({children}: TaskProviderProps) {
     const value = {
         tasks: state.tasks,
         total: state.total,
-        status: state.status,
-        error: state.error,
-        page,
         totalPages,
-        goToPage,
+        loadedPage: state.loadedPage,
+        loadError: state.loadError,
+        loadTasks,
         retry,
-        filter,
-        setFilter,
-        sortOrder,
-        setSortOrder,
         addTask,
         updateTask,
         toggleTask,

@@ -1,21 +1,16 @@
 import {createContext} from 'react'
-import type {LoadStatus} from '../reducers/taskReducer'
-import type {NewTask, Task, TaskFilter, TaskSortOrder} from '../types/task'
+import type {LoadError} from '../reducers/taskReducer'
+import type {NewTask, Task} from '../types/task'
 import type {ToastMessage, ToastType} from '../types/toast'
 
 export type TaskContextValue = {
     tasks: Task[]
     total: number
-    status: LoadStatus
-    error: string | null
-    page: number
     totalPages: number
-    goToPage: (page: number) => void
+    loadedPage: number | null
+    loadError: LoadError | null
+    loadTasks: (page: number, signal: AbortSignal) => Promise<void>
     retry: () => void
-    filter: TaskFilter
-    setFilter: (filter: TaskFilter) => void
-    sortOrder: TaskSortOrder
-    setSortOrder: (sortOrder: TaskSortOrder) => void
     addTask: (task: NewTask) => Promise<void>
     updateTask: (id: number, changes: NewTask) => Promise<void>
     toggleTask: (id: number) => Promise<void>

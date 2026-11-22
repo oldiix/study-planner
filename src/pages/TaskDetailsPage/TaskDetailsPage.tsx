@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import type {ReactNode} from 'react'
-import {Link, useParams} from 'react-router'
+import {Link, useLocation, useParams} from 'react-router'
 import {getErrorMessage} from '../../api/errors'
 import {isAbortError} from '../../api/httpClient'
 import StatusMessage from '../../components/StatusMessage/StatusMessage'
@@ -17,6 +17,10 @@ type LoadResult = {
     id: number
     state: DetailsState
 }
+
+type DetailsLocationState = {
+    backTo?: string
+} | null
 
 function formatDate(value: string | null): string {
     if (!value) {
@@ -83,6 +87,7 @@ function TaskInfo({task}: TaskInfoProps) {
 
 export default function TaskDetailsPage() {
     const {taskId} = useParams()
+    const location = useLocation()
     const {tasks} = useTaskContext()
     const [result, setResult] = useState<LoadResult | null>(null)
     const [reloadCount, setReloadCount] = useState(0)
@@ -91,6 +96,7 @@ export default function TaskDetailsPage() {
     const isValidId = Number.isInteger(id) && id > 0
     const listTask = tasks.find((task) => task.id === id)
     const isLocalTask = listTask?.isLocal === true
+    const backTo = (location.state as DetailsLocationState)?.backTo ?? '/tasks'
 
     useEffect(() => {
         if (!isValidId || isLocalTask) {
@@ -156,7 +162,7 @@ export default function TaskDetailsPage() {
 
     return (
         <section className="task-details-page">
-            <Link to="/tasks" className="task-details-page__back">
+            <Link to={backTo} className="task-details-page__back">
                 ← Back to tasks
             </Link>
             {content}

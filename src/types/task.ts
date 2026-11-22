@@ -9,6 +9,7 @@ export type ServerTaskFields = {
     createdBy: string
 }
 
+// Client-owned metadata: DummyJSON does not store these fields, only the app owns them
 export type ClientTaskFields = {
     description: string
     priority: Priority
@@ -23,5 +24,7 @@ export type Task = ServerTaskFields & ClientTaskFields
 export type NewTask = Pick<Task, 'title' | 'description' | 'category' | 'categoryColor' | 'priority'>
 
 export type TaskFilter = 'all' | 'completed' | 'active'
+
+export type PriorityFilter = 'all' | Priority
 
 export type TaskSortOrder = 'newest' | 'priority'

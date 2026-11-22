@@ -1,4 +1,5 @@
 import {useTaskContext} from '../../hooks/useTaskContext'
+import {useTaskQuery} from '../../hooks/useTaskQuery'
 import type {Priority} from '../../types/task'
 import StatusMessage from '../StatusMessage/StatusMessage'
 import TaskItem from '../TaskItem/TaskItem'
@@ -11,22 +12,23 @@ const priorityRank: Record<Priority, number> = {
 }
 
 export default function TaskList() {
-    const {tasks, status, error, retry, filter, sortOrder} = useTaskContext()
+    const {tasks, loadedPage, loadError, retry} = useTaskContext()
+    const {query, updateQuery} = useTaskQuery()
 
-    if (status === 'loading') {
-        return <StatusMessage variant="loading" title="Loading..."/>
-    }
-
-    if (status === 'error') {
+    if (loadError?.page === query.page) {
         return (
             <StatusMessage
                 variant="error"
                 title="Failed to load tasks."
-                text={error ?? undefined}
+                text={loadError.message}
                 actionLabel="Try again"
                 onAction={retry}
             />
         )
+    }
+
+    if (loadedPage !== query.page) {
+        return <StatusMessage variant="loading" title="Loading..."/>
     }
 
     if (tasks.length === 0) {
@@ -34,22 +36,32 @@ export default function TaskList() {
     }
 
     const filteredTasks = tasks.filter((task) => {
-        if (filter === 'completed') {
-            return task.completed
+        if (query.status === 'completed' && !task.completed) {
+            return false
         }
-        if (filter === 'active') {
-            return !task.completed
+        if (query.status === 'active' && task.completed) {
+            return false
+        }
+        if (query.priority !== 'all' && task.priority !== query.priority) {
+            return false
         }
         return true
     })
 
     const visibleTasks =
-        sortOrder === 'priority'
+        query.sort === 'priority'
             ? [...filteredTasks].sort((a, b) => priorityRank[a.priority] - priorityRank[b.priority])
             : filteredTasks
 
     if (visibleTasks.length === 0) {
-        return <StatusMessage variant="empty" title="No tasks match this filter."/>
+        return (
+            <StatusMessage
+                variant="empty"
+                title="No tasks match these filters."
+                actionLabel="Reset filters"
+                onAction={() => updateQuery({status: 'all', priority: 'all'})}
+            />
+        )
     }
 
     return (

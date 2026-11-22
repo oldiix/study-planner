@@ -1,18 +1,21 @@
 import type {NewTask, Task} from '../types/task'
 
-export type LoadStatus = 'loading' | 'success' | 'error'
+export type LoadError = {
+    page: number
+    message: string
+}
 
 export type TaskState = {
     tasks: Task[]
     total: number
-    status: LoadStatus
-    error: string | null
+    loadedPage: number | null
+    loadError: LoadError | null
 }
 
 export type TaskAction =
-    | { type: 'loadStart' }
-    | { type: 'loadSuccess'; tasks: Task[]; total: number }
-    | { type: 'loadError'; message: string }
+    | { type: 'loadSuccess'; page: number; tasks: Task[]; total: number }
+    | { type: 'loadError'; page: number; message: string }
+    | { type: 'clearLoadError' }
     | { type: 'add'; task: Task }
     | { type: 'update'; id: number; changes: NewTask }
     | { type: 'toggle'; id: number }
@@ -21,20 +24,20 @@ export type TaskAction =
 export const initialTaskState: TaskState = {
     tasks: [],
     total: 0,
-    status: 'loading',
-    error: null,
+    loadedPage: null,
+    loadError: null,
 }
 
 export function taskReducer(state: TaskState, action: TaskAction): TaskState {
     switch (action.type) {
-        case 'loadStart':
-            return {...state, status: 'loading', error: null}
-
         case 'loadSuccess':
-            return {tasks: action.tasks, total: action.total, status: 'success', error: null}
+            return {tasks: action.tasks, total: action.total, loadedPage: action.page, loadError: null}
 
         case 'loadError':
-            return {...state, tasks: [], status: 'error', error: action.message}
+            return {...state, loadError: {page: action.page, message: action.message}}
+
+        case 'clearLoadError':
+            return {...state, loadError: null}
 
         case 'add':
             return {...state, tasks: [action.task, ...state.tasks], total: state.total + 1}
