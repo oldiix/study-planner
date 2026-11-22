@@ -5,6 +5,7 @@ import {getErrorMessage} from '../../api/errors'
 import {isAbortError} from '../../api/httpClient'
 import StatusMessage from '../../components/StatusMessage/StatusMessage'
 import TaskFormDialog from '../../components/TaskFormDialog/TaskFormDialog'
+import {useRequireAuth} from '../../hooks/useRequireAuth'
 import {useTaskContext} from '../../hooks/useTaskContext'
 import {taskRepository} from '../../repositories/taskRepository'
 import type {TaskFormData} from '../../schemas/taskSchema'
@@ -95,6 +96,7 @@ export default function TaskDetailsPage() {
     const location = useLocation()
     const navigate = useNavigate()
     const {tasks, updateTask, deleteTask} = useTaskContext()
+    const requireAuth = useRequireAuth()
     const [result, setResult] = useState<LoadResult | null>(null)
     const [reloadCount, setReloadCount] = useState(0)
     const [isEditOpen, setIsEditOpen] = useState(false)
@@ -132,6 +134,18 @@ export default function TaskDetailsPage() {
         setReloadCount((count) => count + 1)
     }
 
+    function handleEditClick() {
+        if (requireAuth()) {
+            setIsEditOpen(true)
+        }
+    }
+
+    function handleDeleteClick() {
+        if (requireAuth()) {
+            setIsConfirmingDelete(true)
+        }
+    }
+
     async function handleEdit(data: TaskFormData) {
         await updateTask(id, data)
         // DummyJSON does not save changes, so keep the edited values in the loaded result
@@ -143,6 +157,10 @@ export default function TaskDetailsPage() {
     }
 
     async function handleDelete() {
+        if (!requireAuth()) {
+            return
+        }
+
         setIsDeleting(true)
         try {
             await deleteTask(id)
@@ -191,13 +209,13 @@ export default function TaskDetailsPage() {
         </>
     ) : (
         <>
-            <button type="button" className="task-details-page__button" onClick={() => setIsEditOpen(true)}>
+            <button type="button" className="task-details-page__button" onClick={handleEditClick}>
                 Edit
             </button>
             <button
                 type="button"
                 className="task-details-page__button task-details-page__button--danger"
-                onClick={() => setIsConfirmingDelete(true)}
+                onClick={handleDeleteClick}
             >
                 Delete
             </button>

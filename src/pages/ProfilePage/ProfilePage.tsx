@@ -1,4 +1,3 @@
-import {Navigate} from 'react-router'
 import {useAuth} from '../../hooks/useAuth'
 import {useTaskContext} from '../../hooks/useTaskContext'
 import './ProfilePage.scss'
@@ -13,7 +12,7 @@ export default function ProfilePage() {
     }
 
     if (!user) {
-        return <Navigate to="/login" replace/>
+        return null
     }
 
     return (

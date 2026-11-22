@@ -5,6 +5,7 @@ import TaskFormDialog from '../../components/TaskFormDialog/TaskFormDialog'
 import TaskList from '../../components/TaskList/TaskList'
 import TaskSort from '../../components/TaskSort/TaskSort'
 import TaskStats from '../../components/TaskStats/TaskStats'
+import {useRequireAuth} from '../../hooks/useRequireAuth'
 import {useTaskContext} from '../../hooks/useTaskContext'
 import {useTaskQuery} from '../../hooks/useTaskQuery'
 import './TasksPage.scss'
@@ -13,6 +14,7 @@ export default function TasksPage() {
     const {addTask, loadTasks, loadedPage, loadError} = useTaskContext()
     const {query} = useTaskQuery()
     const [isCreateOpen, setIsCreateOpen] = useState(false)
+    const requireAuth = useRequireAuth()
 
     const page = query.page
     const failedPage = loadError?.page ?? null
@@ -28,6 +30,12 @@ export default function TasksPage() {
         return () => controller.abort()
     }, [page, loadedPage, failedPage, loadTasks])
 
+    function handleAddClick() {
+        if (requireAuth()) {
+            setIsCreateOpen(true)
+        }
+    }
+
     return (
         <section className="tasks-page">
             <div className="tasks-page__header">
@@ -35,7 +43,7 @@ export default function TasksPage() {
                     <h1 className="tasks-page__title">Tasks</h1>
                     <p className="tasks-page__subtitle">Plan your study tasks and track your progress</p>
                 </div>
-                <button type="button" className="tasks-page__add" onClick={() => setIsCreateOpen(true)}>
+                <button type="button" className="tasks-page__add" onClick={handleAddClick}>
                     <span aria-hidden="true">+</span> New task
                 </button>
             </div>

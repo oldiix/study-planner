@@ -1,5 +1,6 @@
 import {useState} from 'react'
 import {Link, useLocation} from 'react-router'
+import {useRequireAuth} from '../../hooks/useRequireAuth'
 import {useTaskContext} from '../../hooks/useTaskContext'
 import type {Task} from '../../types/task'
 import './TaskItem.scss'
@@ -11,16 +12,31 @@ type TaskItemProps = {
 export default function TaskItem({task}: TaskItemProps) {
     const {toggleTask, deleteTask} = useTaskContext()
     const location = useLocation()
+    const requireAuth = useRequireAuth()
     const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
     const [isBusy, setIsBusy] = useState(false)
 
     async function handleToggle() {
+        if (!requireAuth()) {
+            return
+        }
+
         setIsBusy(true)
         await toggleTask(task.id)
         setIsBusy(false)
     }
 
+    function handleDeleteClick() {
+        if (requireAuth()) {
+            setIsConfirmingDelete(true)
+        }
+    }
+
     async function handleDelete() {
+        if (!requireAuth()) {
+            return
+        }
+
         setIsBusy(true)
         try {
             await deleteTask(task.id)
@@ -91,7 +107,7 @@ export default function TaskItem({task}: TaskItemProps) {
                         <button
                             type="button"
                             className="task-item__button task-item__button--danger"
-                            onClick={() => setIsConfirmingDelete(true)}
+                            onClick={handleDeleteClick}
                             disabled={isBusy}
                         >
                             Delete
