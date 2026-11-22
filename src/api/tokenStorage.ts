@@ -1,13 +1,13 @@
-let accessToken: string | null = null
+const TOKEN_KEY = 'study-planner:access-token'
 
 export const tokenStorage = {
     get(): string | null {
-        return accessToken
+        return localStorage.getItem(TOKEN_KEY)
     },
     set(token: string) {
-        accessToken = token
+        localStorage.setItem(TOKEN_KEY, token)
     },
     clear() {
-        accessToken = null
+        localStorage.removeItem(TOKEN_KEY)
     },
 }
