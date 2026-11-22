@@ -1,0 +1,108 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.login-page {
+  display: flex;
+  justify-content: center;
+
+  &__card {
+    @include card;
+    width: 100%;
+    max-width: 400px;
+    padding: 28px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  &__hint {
+    margin: 6px 0 24px;
+    font-size: 0.9rem;
+    color: $color-text-muted;
+  }
+
+  &__code {
+    padding: 1px 6px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: $color-text;
+    background-color: $color-bg;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__label {
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  &__input {
+    padding: 8px 12px;
+    border: 1px solid $color-border;
+    border-radius: $radius;
+    color: $color-text;
+    background-color: $color-surface;
+    transition: border-color $transition,
+    box-shadow $transition;
+
+    &:focus {
+      outline: none;
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px $color-primary-light;
+    }
+
+    &--invalid,
+    &--invalid:focus {
+      border-color: $color-danger;
+      box-shadow: 0 0 0 3px $color-danger-light;
+    }
+  }
+
+  &__error {
+    margin: 0;
+    font-size: 0.85rem;
+    color: $color-danger;
+  }
+
+  &__server-error {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: $radius;
+    font-size: 0.9rem;
+    color: $color-danger;
+    background-color: $color-danger-light;
+  }
+
+  &__submit {
+    @include button;
+    padding: 10px;
+    border-color: $color-primary;
+    font-weight: 600;
+    color: #fff;
+    background-color: $color-primary;
+
+    &:hover {
+      border-color: $color-primary-dark;
+      color: #fff;
+      background-color: $color-primary-dark;
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+  }
+}

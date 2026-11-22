@@ -46,6 +46,12 @@
       outline-offset: 2px;
     }
 
+    &--button {
+      border: 0;
+      background-color: transparent;
+      cursor: pointer;
+    }
+
     &--active,
     &--active:hover {
       font-weight: 600;
